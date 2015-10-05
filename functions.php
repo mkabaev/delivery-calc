@@ -15,7 +15,7 @@ function GetResponse_get($url_request) {
         CURLOPT_RETURNTRANSFER => 1,
         CURLOPT_HEADER => 0,
         CURLOPT_PROXY => '10.254.30.3:8080',
-        CURLOPT_PROXYUSERPWD => 'eame\maxim_kabaev:RJHJKMfhneh17'
+        CURLOPT_PROXYUSERPWD => 'eame\maxim_kabaev:RJHJKMfhneh18'
     ];
     return curl_get_contents($curl_options);
 }
@@ -25,7 +25,7 @@ function GetResponse_post($url_request, $ar_request) {
         CURLOPT_RETURNTRANSFER => 1,
         //CURLOPT_HEADER => 0,
         CURLOPT_PROXY => '10.254.30.3:8080',
-        CURLOPT_PROXYUSERPWD => 'eame\maxim_kabaev:RJHJKMfhneh17',
+        CURLOPT_PROXYUSERPWD => 'eame\maxim_kabaev:RJHJKMfhneh18',
         CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
         //CURLOPT_CUSTOMREQUEST => "POST",
         CURLOPT_POST => 1,
@@ -57,17 +57,25 @@ function PrepareReponseArray($responseStatus, $cost_at, $minDays_at, $maxDays_at
     ];
 
     $result = ["status" => $responseStatus];
-    if ($cost_at>0) {
-        $result['auto']=$arr_auto;
+    if ($cost_at > 0) {
+        $result['auto'] = $arr_auto;
     }
-    if ($cost_av>0) {
-        $result['avia']=$arr_avia;
+    if ($cost_av > 0) {
+        $result['avia'] = $arr_avia;
     }
-    if ($cost_rw>0) {
-        $result['rw']=$arr_rw;
+    if ($cost_rw > 0) {
+        $result['rw'] = $arr_rw;
     }
-    if ($additionalInfo!="") {
-        $result['addinfo']=$additionalInfo;
+
+    if ($pickupCost > 0) {
+        $result['pickupCost'] = $pickupCost;
+    }
+    if ($deliveryCost > 0) {
+        $result['deliveryCost'] = $deliveryCost;
+    }
+
+    if ($additionalInfo != "") {
+        $result['addinfo'] = $additionalInfo;
     }
     return $result;
 }

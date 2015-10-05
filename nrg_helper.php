@@ -1,6 +1,6 @@
 <?php
 
-include_once 'functions.php';
+require_once 'functions.php';
 
 function NRG_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
     $id_city_from = NRG_GetCityId($city_from);
@@ -129,6 +129,6 @@ function NRG_GetCitiesCSV() {
 //echo NRG_GetCityId('Рязань');
 
 // TEST NRG
-echo '<pre>';
-print_r(NRG_Calculate("Самара", "ТЮМЕНЬ", 10, 0.16, 1));
-echo '<pre/>';
+//echo '<pre>';
+//print_r(NRG_Calculate("Самара", "ТЮМЕНЬ", 10, 0.16, 1));
+//echo '<pre/>';

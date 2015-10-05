@@ -1,6 +1,6 @@
 <?php
 
-require 'functions.php';
+require_once 'functions.php';
 
 function KIT_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
     $id_city_from = KIT_GetCityId($city_from);
@@ -99,6 +99,6 @@ function KIT_GetCities() {
     //return json_encode($ar_locations, JSON_UNESCAPED_UNICODE);
 }
 
-print_r(KIT_Calculate("Самара", "Рязань", 10, 0.16, 1));
+//print_r(KIT_Calculate("Самара", "Рязань", 10, 0.16, 1));
 //KIT_GetCities();
 //echo KIT_GetCityId('Рязань');

@@ -1,47 +1,50 @@
 <?php
 
-
 require_once 'nrg_helper.php';
 require_once 'dellin_helper.php';
 require_once 'kit_helper.php';
+require_once 'pec_helper.php';
 
 $city_to = filter_input(INPUT_GET, 'city_to');
 $weight = filter_input(INPUT_GET, 'weight');
 $volume = filter_input(INPUT_GET, 'volume');
-$quantity = filter_input(INPUT_GET, '$quantity');
+$quantity = filter_input(INPUT_GET, 'quantity');
 
 //if(empty($_GET["city_to"]) || empty($_GET["weight"]) || empty($_GET["volume"]) || empty($_GET["place"])) {
-if (empty($city_to) || empty($weight) || empty($volume) || empty($place)) {
-    $result["status"] = "err";
-    $result["text"] = "Введены не все данные";
-} else {
-    $ar_NRG_result = NRG_Calculate("Самара", $city_to, $weight, $volume, $quantity);
-    $ar_DELLIN_result = DELLIN_Calculate("Самара", $city_to, $weight, $volume, $quantity);
-    $result = array_merge_recursive($ar_NRG_result, $ar_DELLIN_result);
-}
+//if (empty($city_to) || empty($weight) || empty($volume) || empty($place)) {
+//    $result["status"] = "err";
+//    $result["text"] = "Введены не все данные";
+//} else {
+//    $ar_NRG_result = NRG_Calculate("Самара", $city_to, $weight, $volume, $quantity);
+//    $ar_DELLIN_result = DELLIN_Calculate("Самара", $city_to, $weight, $volume, $quantity);
+//    $result = array_merge_recursive($ar_NRG_result, $ar_DELLIN_result);
+//}
 //echo json_encode($result);
-//echo "<p>NRG:<br/>" . json_encode(NRG_Calculate("Самара", "Москва", 10, 0.16, 1), JSON_UNESCAPED_UNICODE) . "<p/>";
-//echo "<p>Dellin:<br/>" . json_encode(DELLIN_Calculate("Самара", "Москва", 10, 0.16, 1), JSON_UNESCAPED_UNICODE) . "<p/>";
-//echo "<p>KIT:<br/>" . json_encode(KIT_Calculate("Самара", "Москва", 10, 0.16, 1), JSON_UNESCAPED_UNICODE) . "<p/>";
+
+
+
+
+
+
 ////Create Database connection
 
-$mysqli = new mysqli('localhost', 'root', '', 'dbcalc');
-if ($mysqli->connect_error) {
-    die('Connect Error (' . $mysqli->connect_errno . ') ' . $mysqli->connect_error);
-}
-/* Select запросы возвращают результирующий набор */
-mysqli_query($mysqli, "SET NAMES utf8");
-//if ($result = $mysqli->query("SELECT searchString, name FROM cls_cities where searchString like 'Сама%' and code like '%00000000000000000' limit 100")) {
-$searchstring = 'ниж';
-if ($result = $mysqli->query("SELECT code,name FROM `class_okato` WHERE name LIKE '%" . $searchstring . "%' and substring(code,3,1)=4 and substring(code,4,2)!=00 and length(code)<8")) {
-    printf("Select вернул %d строк.\n", $result->num_rows);
-
-    //$data=  mysqli_fetch_assoc($result);
-    $data = mysqli_fetch_all($result, MYSQLI_ASSOC);
-    echo json_encode($data, JSON_UNESCAPED_UNICODE);
-    /* очищаем результирующий набор */
-    $result->close();
-}
+//$mysqli = new mysqli('localhost', 'root', '', 'dbcalc');
+//if ($mysqli->connect_error) {
+//    die('Connect Error (' . $mysqli->connect_errno . ') ' . $mysqli->connect_error);
+//}
+///* Select запросы возвращают результирующий набор */
+//mysqli_query($mysqli, "SET NAMES utf8");
+////if ($result = $mysqli->query("SELECT searchString, name FROM cls_cities where searchString like 'Сама%' and code like '%00000000000000000' limit 100")) {
+//$searchstring = 'ниж';
+//if ($result = $mysqli->query("SELECT code,name FROM `class_okato` WHERE name LIKE '%" . $searchstring . "%' and substring(code,3,1)=4 and substring(code,4,2)!=00 and length(code)<8")) {
+//    printf("Select вернул %d строк.\n", $result->num_rows);
+//
+//    //$data=  mysqli_fetch_assoc($result);
+//    $data = mysqli_fetch_all($result, MYSQLI_ASSOC);
+//    echo json_encode($data, JSON_UNESCAPED_UNICODE);
+//    /* очищаем результирующий набор */
+//    $result->close();
+//}
 
 // Если нужно извлечь большой объем данных, используем MYSQLI_USE_RESULT */
 //if ($result = $mysqli->query("SELECT * FROM City", MYSQLI_USE_RESULT)) {
@@ -55,7 +58,7 @@ if ($result = $mysqli->query("SELECT code,name FROM `class_okato` WHERE name LIK
 //    $result->close();
 //}
 
-$mysqli->close();
+//$mysqli->close();
 
 
 
@@ -91,3 +94,8 @@ $mysqli->close();
 ////     
 ////    //Close the database connection
 //    fclose($db);
+
+echo "<p>ПЭК:<br/>" . json_encode(PEC_Calculate("Самара", "Рязань", 10, 0.16, 1), JSON_UNESCAPED_UNICODE) . "<p/>";
+echo "<p>Энергия:<br/>" . json_encode(NRG_Calculate("Самара", "Рязань", 10, 0.16, 1), JSON_UNESCAPED_UNICODE) . "<p/>";
+//echo "<p>Деловые Линии:<br/>" . json_encode(DELLIN_Calculate("Самара", "Рязань", 10, 0.16, 1), JSON_UNESCAPED_UNICODE) . "<p/>";
+//echo "<p>КИТ:<br/>" . json_encode(KIT_Calculate("Самара", "Рязань", 10, 0.16, 1), JSON_UNESCAPED_UNICODE) . "<p/>";
