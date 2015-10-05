@@ -1,6 +1,6 @@
 <?php
 
-include_once 'functions.php';
+require_once 'functions.php';
 
 $appkey = '330AF810-6347-11E5-B2E6-00505683A6D3'; //Ключ приложения
 $url_pack = 'https://api.dellin.ru/v1/public/packages.json';
@@ -37,10 +37,25 @@ function DELLIN_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
     $url_calc = 'https://api.dellin.ru/v1/public/calculator.json';
     $json_response = GetResponse_post($url_calc, $ar_request);
     $ar = json_decode($json_response, true);
+    
+    $responseStatus='';
+    $cost_at=0;
+    $minDays_at=0;
+    $maxDays_at=0;
+    $cost_av=0;
+    $minDays_av=0;
+    $maxDays_av=0;
+    $cost_rw=0;
+    $minDays_rw=0;
+    $maxDays_rw=0;
+    $pickupCost=0;
+    $deliveryCost=0;
+    $additionalInfo='';
+    
     if (array_key_exists("derival", $ar)) { // if DELLIN response is OK
         //if ($value['type'] == "avto") {
-        $result["status"] = "ok"; // mark result is ok
-        $result["price"] = round($ar['price']);
+        $responseStatus = "ok"; // mark result is ok
+        -$result["price"] = round($ar['price']);
         $result["time"] = $ar['time']['nominative']; // ['value']
         //$result["type"] = $value['type'];
         //} else {
@@ -96,6 +111,6 @@ $mysqli->close();
     return $data[0]['codeKLADR'];
 }
 // TEST DELLIN
-//print_r(DELLIN_Calculate('Самара', 'Рязань', 10, 0.16, 1));
+print_r(DELLIN_Calculate('Самара', 'Рязань', 10, 0.16, 1));
 //echo DELLIN_GetCities_CSVurl(); //ссылка действительна 10 мин с момента получения
 //echo DELLIN_GetCityId('Рязань');
