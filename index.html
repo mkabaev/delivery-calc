@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>TODO</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <script>
+//var xmlhttp = new XMLHttpRequest();
+//var url = "calc.php";
+
+//xmlhttp.onreadystatechange=function() {
+//    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+//        myFunction(xmlhttp.responseText);
+//    }
+//}
+//xmlhttp.open("GET", url, true);
+//xmlhttp.send();
+
+//function myFunction(response) {
+//    var arr = JSON.parse(response);
+//    var i;
+//    var out = "<table>";
+
+ //   for(i = 0; i < arr.length; i++) {
+ //       out += "<tr><td>" +
+ //       arr[i].Name +
+ //       "</td><td>" +
+ //       arr[i].City +
+ //       "</td><td>" +
+ //       arr[i].Country +
+ //       "</td></tr>";
+ //   }
+//    out += "</table>";
+//    document.getElementById("id01").innerHTML = response;
+//}
+
+function processResponse(response) {
+    //var ss = document.getElementById("fdata").id;
+    //alert("ss");
+    document.getElementById("div_result").innerHTML = response;
+}
+
+//var text = '{"employees":[' +
+//'{"firstName":"John","lastName":"Doe" },' +
+//'{"firstName":"Anna","lastName":"Smith" },' +
+//'{"firstName":"Peter","lastName":"Jones" }]}';
+
+//obj = JSON.parse(text);
+//document.getElementById("id01").innerHTML = obj.employees[1].firstName + " " + obj.employees[1].lastName;
+
+function onError(e) {
+  alert("Error " + e.target.status + " occurred while receiving the document.");
+}
+
+function submitForm()
+{
+  var xhr = new XMLHttpRequest();
+        xhr.onload = function(){ processResponse(xhr.responseText); console.log(xhr.response);}; 
+        xhr.onerror = onError;
+        //xhr.open (oFormElement.method, oFormElement.action, true);
+        var city_to=document.getElementById("inp_city_to").value;
+        var volume=document.getElementById("inp_volume").value;
+        var weight=document.getElementById("inp_weight").value;
+        var place=document.getElementById("inp_quantity").value;        
+        xhr.open ("get", "calc.php?city_to="+city_to+"&weight="+weight+"&volume="+volume+"&quantity="+place, true);
+        //xhr.send (new FormData (oFormElement)); //for POST ?
+        xhr.send ();
+  //return false;
+}
+</script>
+
+
+
+
+
+        <form onsubmit="submitForm(); return false;">
+             <p>Город доставки:<input id="inp_city_to" type="text" name="city_to" value="Новосибирск" /></p>
+             <p>Вес, кг:<input id="inp_weight" type="text" name="weight" value="10"/></p>
+             <p>Объем, м3:<input id="inp_volume" type="text" name="volume" value="0.16"/></p>
+             <p>Кол-во мест:<input id="inp_place" type="text" name="place" value="1" /></p>
+             <input type="submit" value="Рассчитать" />
+        </form>
+        <div id="div_result"></div>
+    </body>
+</html>
