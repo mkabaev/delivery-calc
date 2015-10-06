@@ -82,43 +82,11 @@ function NRG_GetCityIdFromFile($city) {
 }
 
 function NRG_GetCityId($city) {
-    $mysqli = new mysqli('localhost', 'root', '', 'dbcalc');
-    if ($mysqli->connect_error) {
-        die('Connect Error (' . $mysqli->connect_errno . ') ' . $mysqli->connect_error);
-    }
-    /* Select запросы возвращают результирующий набор */
-    mysqli_query($mysqli, "SET NAMES utf8");
-//if ($result = $mysqli->query("SELECT searchString, name FROM cls_cities where searchString like 'Сама%' and code like '%00000000000000000' limit 100")) {
-    $searchstring = $city;
-    if ($result = $mysqli->query("SELECT id FROM `nrg_cities` WHERE name LIKE '%" . $searchstring . "%'")) {
-        //printf("Select вернул %d строк.\n", $result->num_rows);
-        //$data=  mysqli_fetch_assoc($result);
-        $data = mysqli_fetch_all($result, MYSQLI_ASSOC);
-        //echo json_encode($data, JSON_UNESCAPED_UNICODE);
-        /* очищаем результирующий набор */
-        $result->close();
-    }
-
-// Если нужно извлечь большой объем данных, используем MYSQLI_USE_RESULT */
-//if ($result = $mysqli->query("SELECT * FROM City", MYSQLI_USE_RESULT)) {
-//
-//    /* Важно заметить, что мы не можем вызывать функции, которые взаимодействуют
-//       с сервером, пока не закроем результирующий набор. Все подобные вызовы
-//       будут вызывать ошибку 'out of sync' */
-//    if (!$mysqli->query("SET @a:='this will not work'")) {
-//        printf("Ошибка: %s\n", $mysqli->error);
-//    }
-//    $result->close();
-//}
-
-    $mysqli->close();
-
-
-
-    return $data[0]['id'];
+    return GetValueFromDB("nrg_cities", "id", $city);
 }
 
 function NRG_GetCitiesCSV() {
+    // после получения списка переименовать С.Петербург в Санкт-Петербург
     $json = GetResponse_get('http://api.nrg-tk.ru/api/rest/?method=nrg.get.locations');     // или можно взять локальный файл вместо запроса file_get_contents('nrg_cities.json');
     $ar_locations = json_decode($json, true)['rsp']['locations'];
     foreach ($ar_locations as $location) {
@@ -145,5 +113,5 @@ function NRG_GetCitiesCSV() {
 //echo NRG_GetCityId('Рязань');
 // TEST NRG
 //echo '<pre>';
-//print_r(NRG_Calculate("Самара", "ТЮМЕНЬ", 10, 0.16, 1));
+//print_r(NRG_Calculate("Самара", "Москва", 10, 0.16, 1));
 //echo '<pre/>';

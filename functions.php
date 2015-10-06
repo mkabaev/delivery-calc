@@ -37,6 +37,43 @@ function GetResponse_post($url_request, $ar_request) {
     return curl_get_contents($curl_options);
 }
 
+function GetValueFromDB($tableName, $valueName, $searchString) {
+    $mysqli = new mysqli('localhost', 'root', '', 'dbcalc');
+    if ($mysqli->connect_error) {
+        die('Connect Error (' . $mysqli->connect_errno . ') ' . $mysqli->connect_error);
+    }
+    /* Select запросы возвращают результирующий набор */
+    mysqli_query($mysqli, "SET NAMES utf8");
+//if ($result = $mysqli->query("SELECT searchString, name FROM cls_cities where searchString like 'Сама%' and code like '%00000000000000000' limit 100")) {
+    if ($result = $mysqli->query("SELECT " . $valueName . " FROM `" . $tableName . "` WHERE name LIKE '%" . $searchString . "%'")) {
+        //printf("Select вернул %d строк.\n", $result->num_rows);
+        //$data=  mysqli_fetch_assoc($result);
+        $data = mysqli_fetch_assoc($result); // all($result, MYSQLI_ASSOC);
+        //echo json_encode($data, JSON_UNESCAPED_UNICODE);
+        /* очищаем результирующий набор */
+        //mysqli_free_result($result);
+        $result->close();
+    }
+
+// Если нужно извлечь большой объем данных, используем MYSQLI_USE_RESULT */
+//if ($result = $mysqli->query("SELECT * FROM City", MYSQLI_USE_RESULT)) {
+//
+//    /* Важно заметить, что мы не можем вызывать функции, которые взаимодействуют
+//       с сервером, пока не закроем результирующий набор. Все подобные вызовы
+//       будут вызывать ошибку 'out of sync' */
+//    if (!$mysqli->query("SET @a:='this will not work'")) {
+//        printf("Ошибка: %s\n", $mysqli->error);
+//    }
+//    $result->close();
+//}
+    $mysqli->close();
+    if (empty($data)) {
+        return NULL;
+    } else {
+        return $data[$valueName];
+    }
+}
+
 function PrepareReponseArray($responseStatus, $cost_at, $minDays_at, $maxDays_at, $cost_av, $minDays_av, $maxDays_av, $cost_rw, $minDays_rw, $maxDays_rw, $pickupCost, $deliveryCost, $additionalInfo) {
     $arr_auto = [
         "cost" => $cost_at,

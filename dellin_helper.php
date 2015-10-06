@@ -89,31 +89,16 @@ function DELLIN_GetCities_CSVurl() {
 }
 
 function DELLIN_GetCityId($city) {
-    $mysqli = new mysqli('localhost', 'root', '', 'dbcalc');
-    if ($mysqli->connect_error) {
-        die('Connect Error (' . $mysqli->connect_errno . ') ' . $mysqli->connect_error);
-    }
-    /* Select запросы возвращают результирующий набор */
-    mysqli_query($mysqli, "SET NAMES utf8");
-//if ($result = $mysqli->query("SELECT searchString, name FROM cls_cities where searchString like 'Сама%' and code like '%00000000000000000' limit 100")) {
-    $searchstring = $city;
-    if ($result = $mysqli->query("SELECT codeKLADR FROM dellin_cities WHERE name LIKE '" . $searchstring . "%'")) {
-        //printf("Select вернул %d строк.\n", $result->num_rows);
-        //$data=  mysqli_fetch_assoc($result);
-        $data = mysqli_fetch_all($result, MYSQLI_ASSOC);
-        //echo json_encode($data, JSON_UNESCAPED_UNICODE);
-        /* очищаем результирующий набор */
-        $result->close();
-    }
-    $mysqli->close();
-    return $data[0]['codeKLADR'];
+    return GetValueFromDB("dellin_cities", "codeKLADR", $city);
 }
 
 // TEST DELLIN
 //echo '<pre>';
 //print_r(DELLIN_Calculate('Самара', 'Рязань', 10, 0.16, 1,true,true));
 //DELLIN_Calculate('Самара', 'Новосибирск', 10, 0.16, 1);
-//echo '</pre>';  
+//echo '<pre>';  
 //print_r(DELLIN_Calculate('Самара', 'Рязань', 10, 0.16, 1));
+//echo '</pre>';  
+
 //echo DELLIN_GetCities_CSVurl(); //ссылка действительна 10 мин с момента получения
-//echo DELLIN_GetCityId('Рязань');
+//echo DELLIN_GetCityId('Самара');

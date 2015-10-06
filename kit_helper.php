@@ -7,7 +7,7 @@ function KIT_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
     $id_city_to = KIT_GetCityId($city_to);
     //ИЗМЕНИТЬ RCODE и прочие
     //SZONE=0000006301&RZONE=0000007700&
-    $url = 'http://tk-kit.ru/API.1/?f=price_order&I_DELIVER=1&I_PICK_UP=1&WEIGHT=' . $weight . '&VOLUME=' . $volume . '&SLAND=RU&SZONE=' . $id_city_from . '&SCODE=860001000000&SREGIO=&RLAND=RU&RZONE=' . $id_city_to . '&RCODE=890000700000&RREGIO=&KWMENG=1&LENGTH=&WIDTH=&HEIGHT=&GR_TYPE=&LIFNR=&PRICE=&WAERS=RUB';
+    $url = 'http://tk-kit.ru/API.1/?f=price_order&I_DELIVER=1&I_PICK_UP=1&WEIGHT=' . $weight . '&VOLUME=' . $volume . '&SLAND=&SZONE=' . $id_city_from . '&SCODE=&SREGIO=&RLAND=RU&RZONE=' . $id_city_to . '&RCODE=890000700000&RREGIO=&KWMENG=1&LENGTH=&WIDTH=&HEIGHT=&GR_TYPE=&LIFNR=&PRICE=1&WAERS=RUB';
     //echo 'request: ' . $url . '<br/>';
 // response is {"PRICE":{"PICKUP":"350.0","TRANSFER":"300.0","DELIVERY":"0.0","TOTAL":"650.0","EXTRA":[{"price":"50.0","name":"\u0421\u0442\u0440\u0430\u0445\u043e\u0432\u0430\u043d\u0438\u0435"}]},"IS_OVER":"","DAYS":3.5,"E_WAERS":"RUB","E_RATE":{"AMD":"8.0","BYR":"300.0","KGS":"1.0","KZT":"5.0","UAH":"0.33333","RUB":1}}
 // response is {"PRICE":{"PICKUP":"350.0","TRANSFER":"500.0","DELIVERY":"400.0","TOTAL":"1250.0"},"IS_OVER":"","DAYS":7,"E_WAERS":"RUB","E_RATE":{"AMD":"8.0","BYR":"300.0","KGS":"1.0","KZT":"5.0","UAH":"0.33333","RUB":1}}
@@ -61,24 +61,7 @@ function KIT_GetCityIdFromFile($city) {
 }
 
 function KIT_GetCityId($city) {
-    $mysqli = new mysqli('localhost', 'root', '', 'dbcalc');
-    if ($mysqli->connect_error) {
-        die('Connect Error (' . $mysqli->connect_errno . ') ' . $mysqli->connect_error);
-    }
-    /* Select запросы возвращают результирующий набор */
-    mysqli_query($mysqli, "SET NAMES utf8");
-//if ($result = $mysqli->query("SELECT searchString, name FROM cls_cities where searchString like 'Сама%' and code like '%00000000000000000' limit 100")) {
-    $searchstring = $city;
-    if ($result = $mysqli->query("SELECT TZONEID FROM kit_cities WHERE name LIKE '%" . $searchstring . "%'")) {
-        //printf("Select вернул %d строк.\n", $result->num_rows);
-        //$data=  mysqli_fetch_assoc($result);
-        $data = mysqli_fetch_all($result, MYSQLI_ASSOC);
-        //echo json_encode($data, JSON_UNESCAPED_UNICODE);
-        /* очищаем результирующий набор */
-        $result->close();
-    }
-    $mysqli->close();
-    return $data[0]['TZONEID'];
+    return GetValueFromDB("kit_cities", "TZONEID", $city);
 }
 
 function KIT_GetCities() {
@@ -105,6 +88,8 @@ function KIT_GetCities() {
     //return json_encode($ar_locations, JSON_UNESCAPED_UNICODE);
 }
 
-//print_r(KIT_Calculate("Самара", "Рязань", 10, 0.16, 1));
+//echo '<pre>';
+//print_r(KIT_Calculate("Самара", "Урай", 10, 0.16, 1));
+//echo '</pre>';
 //KIT_GetCities();
 //echo KIT_GetCityId('Рязань');

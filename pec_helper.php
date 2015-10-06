@@ -37,7 +37,7 @@ function PEC_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
     $ar = json_decode($json_response, true, JSON_UNESCAPED_UNICODE);
 
     $responseStatus = '';
-    $cost_at = $ar['auto'][2];
+    $cost_at = 0;
     $minDays_at = 0;
     $maxDays_at = 0;
     $cost_av = 0;
@@ -117,24 +117,7 @@ function PEC_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
 }
 
 function PEC_GetCityId($city) {
-    $mysqli = new mysqli('localhost', 'root', '', 'dbcalc');
-    if ($mysqli->connect_error) {
-        die('Connect Error (' . $mysqli->connect_errno . ') ' . $mysqli->connect_error);
-    }
-    /* Select запросы возвращают результирующий набор */
-    mysqli_query($mysqli, "SET NAMES utf8");
-//if ($result = $mysqli->query("SELECT searchString, name FROM cls_cities where searchString like 'Сама%' and code like '%00000000000000000' limit 100")) {
-    $searchstring = $city;
-    if ($result = $mysqli->query("SELECT * FROM pec_cities WHERE name LIKE '" . $searchstring . "%'")) {
-        //printf("Select вернул %d строк.\n", $result->num_rows);
-        //$data=  mysqli_fetch_assoc($result);
-        $data = mysqli_fetch_all($result, MYSQLI_ASSOC);
-        //echo json_encode($data, JSON_UNESCAPED_UNICODE);
-        /* очищаем результирующий набор */
-        $result->close();
-    }
-    $mysqli->close();
-    return $data[0]['id'];
+    return GetValueFromDB("pec_cities", "id", $city);
 }
 
 function PEC_GetCitiesCSV() {
@@ -158,6 +141,6 @@ function PEC_GetCitiesCSV() {
 //TEST PEC
 //PEC_GetCitiesCSV();
 //echo PEC_GetCityId('Самара');
-//echo '<hr/><pre>';
+//echo '<pre>';
 //print_r(PEC_Calculate("Самара", "Новосибирск", 10, 0.16, 1));
 //echo '</pre>';
