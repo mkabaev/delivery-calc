@@ -58,16 +58,17 @@ function PEC_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
     //echo '<br/>ALLARRAY<pre>';
     //print_r($ar);
     //echo '<pre/>';
-
     if (array_key_exists("auto", $ar)) {
         $responseStatus='ok';
         $cost_at = $ar['auto'][2];
         if (array_key_exists("periods", $ar)) {
-            $minDays_at = $ar['periods'];
-            $maxDays_at = $ar['periods'];
-            // TODO распарсить
-            //Количество суток в пути: 4 - 6
-            //Дни отправки: пн, вт, ср, чт, пт, сб, вс
+            preg_match_all('!\d+!', $ar['periods'], $matches);
+            if (array_key_exists(0, $matches[0])){
+                $minDays_at = round($matches[0][0]);
+            }
+            if (array_key_exists(1, $matches[0])){
+            $maxDays_at = round($matches[0][1]);
+            }
         }
         if (array_key_exists("alma_auto", $ar)) { // доп. стоимость для Алматы
             $cost_at=$cost_at+$ar['alma_auto'][2];

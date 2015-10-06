@@ -9,41 +9,61 @@ function NRG_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
     $json_response = GetResponse_get($url);
     $ar = json_decode($json_response, true)['rsp'];
 
-    $responseStatus='';
-    $cost_at=0;
-    $minDays_at=0;
-    $maxDays_at=0;
-    $cost_av=0;
-    $minDays_av=0;
-    $maxDays_av=0;
-    $cost_rw=0;
-    $minDays_rw=0;
-    $maxDays_rw=0;
-    $pickupCost=0;
-    $deliveryCost=0;
-    $additionalInfo='';
+    $responseStatus = '';
+    $cost_at = 0;
+    $minDays_at = 0;
+    $maxDays_at = 0;
+    $cost_av = 0;
+    $minDays_av = 0;
+    $maxDays_av = 0;
+    $cost_rw = 0;
+    $minDays_rw = 0;
+    $maxDays_rw = 0;
+    $pickupCost = 0;
+    $deliveryCost = 0;
+    $additionalInfo = '';
     if ($ar['stat'] == "ok") { // if NRG response is OK
-        $responseStatus='ok';
+        $responseStatus = 'ok';
+
         foreach ($ar['values'] as $value) {
             if ($value['type'] == "avto") {
-                $cost_at=$value['price'];
-                $minDays_at=$value['term'];
-                $maxDays_at=$value['term'];
+                $cost_at = $value['price'];
+
+                //extract periods
+                preg_match_all('!\d+!', $value['term'], $matches);
+                if (array_key_exists(0, $matches[0])) {
+                    $minDays_at = round($matches[0][0]);
+                }
+                if (array_key_exists(1, $matches[0])) {
+                    $maxDays_at = round($matches[0][1]);
+                }
             }
             if ($value['type'] == "rw") {
-                $cost_rw=$value['price'];
-                $minDays_rw=$value['term'];
-                $maxDays_rw=$value['term'];
+                $cost_rw = $value['price'];
+                //extract periods
+                preg_match_all('!\d+!', $value['term'], $matches);
+                if (array_key_exists(0, $matches[0])) {
+                    $minDays_rw = round($matches[0][0]);
+                }
+                if (array_key_exists(1, $matches[0])) {
+                    $maxDays_rw = round($matches[0][1]);
+                }
             }
             if ($value['type'] == "avia") {
-                $cost_av=$value['price'];
-                $minDays_av=$value['term'];
-                $maxDays_av=$value['term'];
+                $cost_av = $value['price'];
+                //extract periods
+                preg_match_all('!\d+!', $value['term'], $matches);
+                if (array_key_exists(0, $matches[0])) {
+                    $minDays_av = round($matches[0][0]);
+                }
+                if (array_key_exists(1, $matches[0])) {
+                    $maxDays_av = ($matches[0][1]);
+                }
             }
         }
     } else {
-        $responseStatus='err';
-        $additionalInfo='NRG Api error';
+        $responseStatus = 'err';
+        $additionalInfo = 'NRG Api error';
     }
     return PrepareReponseArray($responseStatus, $cost_at, $minDays_at, $maxDays_at, $cost_av, $minDays_av, $maxDays_av, $cost_rw, $minDays_rw, $maxDays_rw, $pickupCost, $deliveryCost, $additionalInfo);
 }
@@ -62,22 +82,22 @@ function NRG_GetCityIdFromFile($city) {
 }
 
 function NRG_GetCityId($city) {
-$mysqli = new mysqli('localhost', 'root', '', 'dbcalc');
-if ($mysqli->connect_error) {
-    die('Connect Error (' . $mysqli->connect_errno . ') ' . $mysqli->connect_error);
-}
-/* Select запросы возвращают результирующий набор */
-mysqli_query($mysqli, "SET NAMES utf8");
+    $mysqli = new mysqli('localhost', 'root', '', 'dbcalc');
+    if ($mysqli->connect_error) {
+        die('Connect Error (' . $mysqli->connect_errno . ') ' . $mysqli->connect_error);
+    }
+    /* Select запросы возвращают результирующий набор */
+    mysqli_query($mysqli, "SET NAMES utf8");
 //if ($result = $mysqli->query("SELECT searchString, name FROM cls_cities where searchString like 'Сама%' and code like '%00000000000000000' limit 100")) {
-$searchstring = $city;
-if ($result = $mysqli->query("SELECT id FROM `nrg_cities` WHERE name LIKE '%" . $searchstring . "%'")) {
-    //printf("Select вернул %d строк.\n", $result->num_rows);
-    //$data=  mysqli_fetch_assoc($result);
-    $data = mysqli_fetch_all($result, MYSQLI_ASSOC);
-    //echo json_encode($data, JSON_UNESCAPED_UNICODE);
-    /* очищаем результирующий набор */
-    $result->close();
-}
+    $searchstring = $city;
+    if ($result = $mysqli->query("SELECT id FROM `nrg_cities` WHERE name LIKE '%" . $searchstring . "%'")) {
+        //printf("Select вернул %d строк.\n", $result->num_rows);
+        //$data=  mysqli_fetch_assoc($result);
+        $data = mysqli_fetch_all($result, MYSQLI_ASSOC);
+        //echo json_encode($data, JSON_UNESCAPED_UNICODE);
+        /* очищаем результирующий набор */
+        $result->close();
+    }
 
 // Если нужно извлечь большой объем данных, используем MYSQLI_USE_RESULT */
 //if ($result = $mysqli->query("SELECT * FROM City", MYSQLI_USE_RESULT)) {
@@ -91,7 +111,7 @@ if ($result = $mysqli->query("SELECT id FROM `nrg_cities` WHERE name LIKE '%" . 
 //    $result->close();
 //}
 
-$mysqli->close();
+    $mysqli->close();
 
 
 
@@ -107,27 +127,22 @@ function NRG_GetCitiesCSV() {
 }
 
 //echo NRG_GetCitiesCSV();
-
 //{"error":"1","errorcode":["empty_pers","empty_mail","empty_phone","empty_letter","empty_scode"]}
-        //$json_data = array ('id'=>1,'name'=>"ivan",'country'=>'Russia',"office"=>array("yandex"," management"));
-        //echo json_encode($json_data);
-        
-        //$json_string='{"id":1,"name":"ivan","country":"Russia","office":["yandex"," management"]} ';
-        //$obj=json_decode($json_string); 
-        //echo $obj->name; //Отобразит имя ivan
-        //echo $obj->office[0]; //Отобразит компанию yandex
+//$json_data = array ('id'=>1,'name'=>"ivan",'country'=>'Russia',"office"=>array("yandex"," management"));
+//echo json_encode($json_data);
+//$json_string='{"id":1,"name":"ivan","country":"Russia","office":["yandex"," management"]} ';
+//$obj=json_decode($json_string); 
+//echo $obj->name; //Отобразит имя ivan
+//echo $obj->office[0]; //Отобразит компанию yandex
 //$ar_NRG["status"]="ok";
 //$ar_NRG["tk"]="energy";
 //$ar_tk_data["price"]="250";
 //$ar_tk_data["term"]="3-5 days";
 //$ar_tk_data["type"] ="Avto";
-
 //$ar["NRG"]=$ar_tk_data;
 //$ar["KIT"]=$ar_tk_data;
 //echo json_encode($ar);
-
 //echo NRG_GetCityId('Рязань');
-
 // TEST NRG
 //echo '<pre>';
 //print_r(NRG_Calculate("Самара", "ТЮМЕНЬ", 10, 0.16, 1));

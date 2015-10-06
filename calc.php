@@ -94,8 +94,8 @@ $quantity = filter_input(INPUT_GET, 'quantity');
 ////     
 ////    //Close the database connection
 //    fclose($db);
-
-echo "<p>ПЭК:<br/>" . json_encode(PEC_Calculate("Самара", "Рязань", 10, 0.16, 1), JSON_UNESCAPED_UNICODE) . "<p/>";
-echo "<p>Энергия:<br/>" . json_encode(NRG_Calculate("Самара", "Рязань", 10, 0.16, 1), JSON_UNESCAPED_UNICODE) . "<p/>";
-//echo "<p>Деловые Линии:<br/>" . json_encode(DELLIN_Calculate("Самара", "Рязань", 10, 0.16, 1), JSON_UNESCAPED_UNICODE) . "<p/>";
-//echo "<p>КИТ:<br/>" . json_encode(KIT_Calculate("Самара", "Рязань", 10, 0.16, 1), JSON_UNESCAPED_UNICODE) . "<p/>";
+echo 'TEST';
+//echo "<p>ПЭК:<br/>" . json_encode(PEC_Calculate("Самара", $city_to, $weight, $volume, $quantity), JSON_UNESCAPED_UNICODE) . "<p/>";
+//echo "<p>Энергия:<br/>" . json_encode(NRG_Calculate("Самара", $city_to, $weight, $volume, $quantity), JSON_UNESCAPED_UNICODE) . "<p/>";
+//echo "<p>Деловые Линии:<br/>" . json_encode(DELLIN_Calculate("Самара", $city_to, $weight, $volume, $quantity), JSON_UNESCAPED_UNICODE) . "<p/>";
+//echo "<p>КИТ:<br/>" . json_encode(KIT_Calculate("Самара", $city_to, $weight, $volume, $quantity), JSON_UNESCAPED_UNICODE) . "<p/>";

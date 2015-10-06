@@ -7,36 +7,42 @@ function KIT_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
     $id_city_to = KIT_GetCityId($city_to);
     //ИЗМЕНИТЬ RCODE и прочие
     //SZONE=0000006301&RZONE=0000007700&
-    $url = 'http://tk-kit.ru/API.1/?f=price_order&I_DELIVER=0&I_PICK_UP=0&WEIGHT=' . $weight . '&VOLUME=' . $volume . '&SLAND=RU&SZONE=' . $id_city_from . '&SCODE=860001000000&SREGIO=86&RLAND=RU&RZONE=' . $id_city_to . '&RCODE=890000700000&RREGIO=89&KWMENG=1&LENGTH=&WIDTH=&HEIGHT=&GR_TYPE=&LIFNR=&PRICE=&WAERS=RUB';
-    echo 'request: '.$url.'<br/>';
+    $url = 'http://tk-kit.ru/API.1/?f=price_order&I_DELIVER=1&I_PICK_UP=1&WEIGHT=' . $weight . '&VOLUME=' . $volume . '&SLAND=RU&SZONE=' . $id_city_from . '&SCODE=860001000000&SREGIO=&RLAND=RU&RZONE=' . $id_city_to . '&RCODE=890000700000&RREGIO=&KWMENG=1&LENGTH=&WIDTH=&HEIGHT=&GR_TYPE=&LIFNR=&PRICE=&WAERS=RUB';
+    //echo 'request: ' . $url . '<br/>';
 // response is {"PRICE":{"PICKUP":"350.0","TRANSFER":"300.0","DELIVERY":"0.0","TOTAL":"650.0","EXTRA":[{"price":"50.0","name":"\u0421\u0442\u0440\u0430\u0445\u043e\u0432\u0430\u043d\u0438\u0435"}]},"IS_OVER":"","DAYS":3.5,"E_WAERS":"RUB","E_RATE":{"AMD":"8.0","BYR":"300.0","KGS":"1.0","KZT":"5.0","UAH":"0.33333","RUB":1}}
-    $json_response=GetResponse_get($url);
-    echo '<hr/>response is: '.$json_response;
+// response is {"PRICE":{"PICKUP":"350.0","TRANSFER":"500.0","DELIVERY":"400.0","TOTAL":"1250.0"},"IS_OVER":"","DAYS":7,"E_WAERS":"RUB","E_RATE":{"AMD":"8.0","BYR":"300.0","KGS":"1.0","KZT":"5.0","UAH":"0.33333","RUB":1}}
+    $json_response = GetResponse_get($url);
+    //echo '<hr/>response is: ' . $json_response;
     $ar = json_decode($json_response, true);
-    //echo "Status: ".$ar_json['stat']."<br>";
+    $responseStatus = '';
+    $cost_at = 0;
+    $minDays_at = 0;
+    $maxDays_at = 0;
+    $cost_av = 0;
+    $minDays_av = 0;
+    $maxDays_av = 0;
+    $cost_rw = 0;
+    $minDays_rw = 0;
+    $maxDays_rw = 0;
+    $pickupCost = 0;
+    $deliveryCost = 0;
+    $additionalInfo = '';
 
+//    echo '<pre>';
+//    print_r($ar);
+//    echo '</pre>';
     if (array_key_exists("PRICE", $ar)) { // if KIT response is OK
-        //if ($value['type'] == "avto") {
-        $result["status"] = "ok"; // mark result is ok
-        $result["price"] = round($ar['PRICE']['TOTAL']);
-        //   $result["time"] = $ar['time']['nominative']; // ['value']
-        //$result["type"] = $value['type'];
-        //} else {
-        //    $result["status"] = "err";
-        //    $result["text"] = "Нет доставки АВТО";
-        //}
-        //$result = $result."Тип перевозки: ".$value['type']." | Цена: ".$value['price']." | Время доставки: ".$value['term'];
+        $responseStatus = 'ok';
+        $cost_at = round($ar['PRICE']['TRANSFER']);
+        $pickupCost = round($ar['PRICE']['PICKUP']);
+        $deliveryCost = round($ar['PRICE']['DELIVERY']);
+        $minDays_at=round($ar['DAYS']);
+        $maxDays_at=round($ar['DAYS']);
     } else {
         $result["status"] = "err";
         $result["text"] = "KIT API error";
     }
-
-    //echo "price: " . $ar['price'] . "<br>";
-    //echo "time: " . $ar['time']['value'] . "<br>";
-    //echo "<hr/>" . $json_response;
-
-
-    return $result;
+    return PrepareReponseArray($responseStatus, $cost_at, $minDays_at, $maxDays_at, $cost_av, $minDays_av, $maxDays_av, $cost_rw, $minDays_rw, $maxDays_rw, $pickupCost, $deliveryCost, $additionalInfo);
 }
 
 function KIT_GetCityIdFromFile($city) {
