@@ -94,7 +94,7 @@ $quantity = filter_input(INPUT_GET, 'quantity');
 ////     
 ////    //Close the database connection
 //    fclose($db);
-echo 'TEST';
+echo 'TEST '.$city_to;
 //echo "<p>ПЭК:<br/>" . json_encode(PEC_Calculate("Самара", $city_to, $weight, $volume, $quantity), JSON_UNESCAPED_UNICODE) . "<p/>";
 //echo "<p>Энергия:<br/>" . json_encode(NRG_Calculate("Самара", $city_to, $weight, $volume, $quantity), JSON_UNESCAPED_UNICODE) . "<p/>";
 //echo "<p>Деловые Линии:<br/>" . json_encode(DELLIN_Calculate("Самара", $city_to, $weight, $volume, $quantity), JSON_UNESCAPED_UNICODE) . "<p/>";

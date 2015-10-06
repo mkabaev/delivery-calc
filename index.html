@@ -79,12 +79,13 @@
 
 
 
-        <form onsubmit="submitForm(); return false;">
+        <form action="calc.php">
+        <!--<form onsubmit="submitForm(); return false;"> -->
             <p>Город доставки:<input id="inp_city_to" type="text" name="city_to" value="Новосибирск" /></p>
             <p>Вес, кг:<input id="inp_weight" type="text" name="weight" value="10"/></p>
             <p>Объем, м3:<input id="inp_volume" type="text" name="volume" value="0.16"/></p>
             <p>Кол-во мест:<input id="inp_place" type="text" name="place" value="1" /></p>
-            <input type="submit" value="Рассчитать" />
+            <input type="submit" value="Рассчитать" onclick="submitForm(); return false;" />
         </form>
         <div id="div_result"></div>
     </body>
