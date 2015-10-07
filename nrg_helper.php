@@ -2,13 +2,16 @@
 
 require_once 'functions.php';
 
+/**
+ * Функция Калькулятор ТК Энергия
+ * @param string $city_from Город отправитель
+ * @param string $city_to Город получатель
+ * @param integer $weight Вес груза в кг
+ * @param float $volume Объем груза в м3 (например 0.16)
+ * @param integer $quantity Кол-во мест
+ * @return Array
+ */
 function NRG_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
-    $id_city_from = NRG_GetCityId($city_from);
-    $id_city_to = NRG_GetCityId($city_to);
-    $url = 'http://api.nrg-tk.ru/api/rest/?method=nrg.calculate&from=' . $id_city_from . '&to=' . $id_city_to . '&weight=' . $weight . '&volume=' . $volume . '&place=' . $quantity;
-    $json_response = GetResponse_get($url);
-    $ar = json_decode($json_response, true)['rsp'];
-
     $responseStatus = '';
     $cost_at = 0;
     $minDays_at = 0;
@@ -22,48 +25,62 @@ function NRG_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
     $pickupCost = 0;
     $deliveryCost = 0;
     $additionalInfo = '';
-    if ($ar['stat'] == "ok") { // if NRG response is OK
-        $responseStatus = 'ok';
 
-        foreach ($ar['values'] as $value) {
-            if ($value['type'] == "avto") {
-                $cost_at = $value['price'];
+    $id_city_from = NRG_GetCityId($city_from);
+    $id_city_to = NRG_GetCityId($city_to);
 
-                //extract periods
-                preg_match_all('!\d+!', $value['term'], $matches);
-                if (array_key_exists(0, $matches[0])) {
-                    $minDays_at = round($matches[0][0]);
-                }
-                if (array_key_exists(1, $matches[0])) {
-                    $maxDays_at = round($matches[0][1]);
-                }
-            }
-            if ($value['type'] == "rw") {
-                $cost_rw = $value['price'];
-                //extract periods
-                preg_match_all('!\d+!', $value['term'], $matches);
-                if (array_key_exists(0, $matches[0])) {
-                    $minDays_rw = round($matches[0][0]);
-                }
-                if (array_key_exists(1, $matches[0])) {
-                    $maxDays_rw = round($matches[0][1]);
-                }
-            }
-            if ($value['type'] == "avia") {
-                $cost_av = $value['price'];
-                //extract periods
-                preg_match_all('!\d+!', $value['term'], $matches);
-                if (array_key_exists(0, $matches[0])) {
-                    $minDays_av = round($matches[0][0]);
-                }
-                if (array_key_exists(1, $matches[0])) {
-                    $maxDays_av = ($matches[0][1]);
-                }
-            }
-        }
+    if (is_null($id_city_from) or is_null($id_city_to)) {
+        $responseStatus = "err";
+        $additionalInfo = "В базе данных не найден один из городов отправитель|получатель: " . $id_city_from . "|" . $id_city_to;
     } else {
-        $responseStatus = 'err';
-        $additionalInfo = 'NRG Api error';
+        $url = 'http://api.nrg-tk.ru/api/rest/?method=nrg.calculate&from=' . $id_city_from . '&to=' . $id_city_to . '&weight=' . $weight . '&volume=' . $volume . '&place=' . $quantity;
+        //echo $url;
+        $json_response = GetResponse_get($url);
+        $ar = json_decode($json_response, true)['rsp'];
+
+        if ($ar['stat'] == "ok") { // if NRG response is OK
+            $responseStatus = 'ok';
+
+            foreach ($ar['values'] as $value) {
+                if ($value['type'] == "avto") {
+                    $cost_at = $value['price'];
+
+                    //extract periods
+                    preg_match_all('!\d+!', $value['term'], $matches);
+                    if (array_key_exists(0, $matches[0])) {
+                        $minDays_at = round($matches[0][0]);
+                    }
+                    if (array_key_exists(1, $matches[0])) {
+                        $maxDays_at = round($matches[0][1]);
+                    }
+                }
+                if ($value['type'] == "rw") {
+                    $cost_rw = $value['price'];
+                    //extract periods
+                    preg_match_all('!\d+!', $value['term'], $matches);
+                    if (array_key_exists(0, $matches[0])) {
+                        $minDays_rw = round($matches[0][0]);
+                    }
+                    if (array_key_exists(1, $matches[0])) {
+                        $maxDays_rw = round($matches[0][1]);
+                    }
+                }
+                if ($value['type'] == "avia") {
+                    $cost_av = $value['price'];
+                    //extract periods
+                    preg_match_all('!\d+!', $value['term'], $matches);
+                    if (array_key_exists(0, $matches[0])) {
+                        $minDays_av = round($matches[0][0]);
+                    }
+                    if (array_key_exists(1, $matches[0])) {
+                        $maxDays_av = ($matches[0][1]);
+                    }
+                }
+            }
+        } else {
+            $responseStatus = 'err';
+            $additionalInfo = 'NRG Api error';
+        }
     }
     return PrepareReponseArray($responseStatus, $cost_at, $minDays_at, $maxDays_at, $cost_av, $minDays_av, $maxDays_av, $cost_rw, $minDays_rw, $maxDays_rw, $pickupCost, $deliveryCost, $additionalInfo);
 }
@@ -113,5 +130,7 @@ function NRG_GetCitiesCSV() {
 //echo NRG_GetCityId('Рязань');
 // TEST NRG
 //echo '<pre>';
-//print_r(NRG_Calculate("Самара", "Москва", 10, 0.16, 1));
-//echo '<pre/>';
+//$start = microtime(true);
+//print_r(NRG_Calculate('Самара', 'Рязань', 10, 0.16, 1));
+//echo "Время выполнения скрипта: " . (microtime(true) - $start);
+//echo '</pre>';
