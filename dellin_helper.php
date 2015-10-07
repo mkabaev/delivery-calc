@@ -45,8 +45,8 @@ function DELLIN_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
             "derivalDoor" => true, // необходима доставка груза от адреса     (необязательный параметр), true/false
             "arrivalPoint" => $id_city_to, // код КЛАДР пункта прибытия (обязательный параметр)
             "arrivalDoor" => true, // необходима доставка груза до адреса    (необязательный параметр), true/false
-            "sizedVolume" => $volume, // общий объём груза в кубических метрах (обязательный параметр)
-            "sizedWeight" => $weight, // общий вес груза в килограммах (обязательный параметр)
+            "sizedVolume" => $volume*$quantity, // общий объём груза в кубических метрах (обязательный параметр)
+            "sizedWeight" => $weight*$quantity, // общий вес груза в килограммах (обязательный параметр)
             //    "oversizedVolume" => "1", // объём негабаритной части груза в метрах кубических (необязательный параметр)
             //    "oversizedWeight" => "1", // вес негабаритной части груза в килограммах (необязательный параметр)
             //    "length" => "1", // длинна самого длинного из мест (необязательный параметр)
@@ -63,7 +63,9 @@ function DELLIN_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
         $url_calc = 'https://api.dellin.ru/v1/public/calculator.json';
         $json_response = GetResponse_post($url_calc, $ar_request);
         $ar = json_decode($json_response, true);
-
+//echo '<pre>';
+//print_r($ar_request);
+//echo '</pre><hr/>';
         if (!array_key_exists("errorses", $ar)) { // if DELLIN response is OK
             $responseStatus = "ok"; // mark result is ok
             if (array_key_exists("derival", $ar)) {
@@ -106,7 +108,7 @@ function DELLIN_GetCityId($city) {
 // TEST DELLIN
 //echo '<pre>';
 //$start = microtime(true);
-//print_r(DELLIN_Calculate('Самара', 'Новосибирск', 10, 0.16, 1));
+//print_r(DELLIN_Calculate('Самара', 'Санкт-Петербург', 10, 0.1, 3));
 //echo "Время выполнения скрипта: " . (microtime(true) - $start);
 //echo '</pre>';
 

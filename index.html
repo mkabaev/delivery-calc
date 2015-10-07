@@ -35,21 +35,13 @@
 //    out += "</table>";
 //    document.getElementById("id01").innerHTML = response;
 //}
-
-            function processResponse(response) {
-                //var ss = document.getElementById("fdata").id;
-                //alert("ss");
-                alert('process response');
-                //document.getElementById("div_result").innerHTML = response;
+            function setText(text) {
+                document.getElementById("div_result").innerHTML = text;
             }
 
-//var text = '{"employees":[' +
-//'{"firstName":"John","lastName":"Doe" },' +
-//'{"firstName":"Anna","lastName":"Smith" },' +
-//'{"firstName":"Peter","lastName":"Jones" }]}';
-
-//obj = JSON.parse(text);
-//document.getElementById("id01").innerHTML = obj.employees[1].firstName + " " + obj.employees[1].lastName;
+            function processResponse(response) {
+                setText(response);
+            }
 
             function onError(e) {
                 alert("Error " + e.target.status + " occurred while receiving the document.");
@@ -67,21 +59,21 @@
                 var city_to = document.getElementById("inp_city_to").value;
                 var volume = document.getElementById("inp_volume").value;
                 var weight = document.getElementById("inp_weight").value;
-                var place = document.getElementById("inp_quantity").value;
-                xhr.open("get", "calc.php?city_to=" + city_to + "&weight=" + weight + "&volume=" + volume + "&quantity=" + place, true);
+                var quantity = document.getElementById("inp_quantity").value;
+                xhr.open("get", "calc.php?city_to=" + city_to + "&weight=" + weight + "&volume=" + volume + "&quantity=" + quantity+"&isHTMLResult=true", true);
                 //xhr.send (new FormData (oFormElement)); //for POST ?
                 xhr.send();
                 //return false;
             }
         </script>
 
-        <form action="calc.php">
-        <!--<form onsubmit="submitForm(); return false;"> -->
+        <form>
+        <!-- action="calc.php"   <form onsubmit="submitForm(); return false;"> -->
             <p>Город доставки:<input id="inp_city_to" type="text" name="city_to" value="Новосибирск" /></p>
             <p>Вес, кг:<input id="inp_weight" type="text" name="weight" value="10"/></p>
             <p>Объем, м3:<input id="inp_volume" type="text" name="volume" value="0.16"/></p>
             <p>Кол-во мест:<input id="inp_quantity" type="text" name="quantity" value="1" /></p>
-            <input type="submit" value="Рассчитать" onclick="submitForm(); return false;" />
+            <input type="submit" value="Рассчитать" onclick="submitForm(); setText('<h3>Подождите, опрашиваю сайты ТК...</h3>'); return false;" />
         </form>
         <div id="div_result"></div>
     </body>

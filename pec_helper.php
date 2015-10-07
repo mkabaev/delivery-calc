@@ -59,7 +59,7 @@ function PEC_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
         //pal: 3 	Требуется запаллечивание груза (0 - не требуется, значение больше нуля - количество паллет)
         //pallets: 4 	Кол-во паллет для расчет услуги паллетной перевозки (только там, где эта услуга предоставляется)
 
-        $url = 'http://pecom.ru/bitrix/components/pecom/calc/ajax.php?places[0][]=&places[0][]=&places[0][]=&places[0][]=' . $volume . '&places[0][]=' . $weight . '&places[0][]=0&places[0][]=0&take[town]=' . $id_city_from . '&take[tent]=0&take[gidro]=0&take[manip]=0&take[speed]=0&take[moscow]=0&deliver[town]=' . $id_city_to . '&deliver[tent]=0&deliver[gidro]=0&deliver[manip]=0&deliver[speed]=0&deliver[moscow]=0&plombir=0&strah=0&ashan=0&night=0&pal=0&pallets=0';
+        $url = 'http://pecom.ru/bitrix/components/pecom/calc/ajax.php?places[0][]=&places[0][]=&places[0][]=&places[0][]=' . $volume*$quantity . '&places[0][]=' . $weight*$quantity . '&places[0][]=0&places[0][]=0&take[town]=' . $id_city_from . '&take[tent]=0&take[gidro]=0&take[manip]=0&take[speed]=0&take[moscow]=0&deliver[town]=' . $id_city_to . '&deliver[tent]=0&deliver[gidro]=0&deliver[manip]=0&deliver[speed]=0&deliver[moscow]=0&plombir=0&strah=0&ashan=0&night=0&pal=0&pallets=0';
         $json_response = GetResponse_get($url);
         $ar = json_decode($json_response, true, JSON_UNESCAPED_UNICODE);
         if (array_key_exists("auto", $ar) or array_key_exists("avia", $ar)) { // if PEC response is OK
@@ -128,6 +128,6 @@ function PEC_GetCitiesCSV() {
 //echo PEC_GetCityId('Самара');
 //echo '<pre>';
 //$start = microtime(true);
-//print_r(PEC_Calculate('Самара', 'Рязань', 10, 0.16, 1));
+//print_r(PEC_Calculate('Самара', 'Новосибирск', 10, 0.16, 2));
 //echo "Время выполнения скрипта: " . (microtime(true) - $start);
 //echo '</pre>';

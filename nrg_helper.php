@@ -131,6 +131,6 @@ function NRG_GetCitiesCSV() {
 // TEST NRG
 //echo '<pre>';
 //$start = microtime(true);
-//print_r(NRG_Calculate('Самара', 'Рязань', 10, 0.16, 1));
+//print_r(NRG_Calculate('Самара', 'Новосибирск', 10, 0.16, 1));
 //echo "Время выполнения скрипта: " . (microtime(true) - $start);
 //echo '</pre>';
