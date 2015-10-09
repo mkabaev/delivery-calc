@@ -33,7 +33,7 @@ function JDE_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
         $responseStatus = "err";
         $additionalInfo = "В базе данных не найден один из городов отправитель|получатель: " . $id_city_from . "|" . $id_city_to;
     } else {
-        $url = "http://apitest.jde.ru:8000/calculator/price?from=".$id_city_from."&to=".$id_city_to."&weight=".$weight."&width=1&volume=".$volume;
+        $url = "http://apitest.jde.ru:8000/calculator/price?from=".$id_city_from."&to=".$id_city_to."&weight=".$weight*$quantity."&width=1&volume=".$volume*$quantity;
         //echo $url;
         $json_response = GetResponse_get($url);
         // normal response: {"price":"5118.0000","mindays":"7","maxdays":"10"}
@@ -43,9 +43,9 @@ function JDE_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
         $ar = json_decode($json_response, true);
         if ($ar != -1 or array_key_exists('errors', $ar)) { // if JDE response is OK
             $responseStatus = 'ok';
-            $cost_at = round($ar['price']);
-            $minDays_at = $ar['mindays'];
-            $maxDays_at = $ar['maxdays'];
+            $cost_rw = round($ar['price']);
+            $minDays_rw = $ar['mindays'];
+            $maxDays_rw = $ar['maxdays'];
         } else {
             $responseStatus = 'err';
             $additionalInfo = 'JDE Api error';
@@ -57,18 +57,17 @@ function JDE_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
     return PrepareReponseArray($responseStatus, $cost_at, $minDays_at, $maxDays_at, $cost_av, $minDays_av, $maxDays_av, $cost_rw, $minDays_rw, $maxDays_rw, $pickupCost, $deliveryCost, $additionalInfo);
 }
 
-function JDE_GetCityIdFromFile($city) {
-    $json = file_get_contents('nrg_cities.json');
-    //$json = curl_get_contents('http://api.nrg-tk.ru/api/rest/?method=nrg.get.locations');
-    $ar_locations = json_decode($json, true)['rsp']['locations'];
-    foreach ($ar_locations as $location) {
-        if (strcasecmp(mb_strtoupper($location['name'], 'utf8'), mb_strtoupper($city, 'utf8')) == 0) {
-            $result = $location['id'];
-            break;
-        }
-    }
-    return $result;
-}
+//function JDE_GetCityIdFromFile($city) {
+//    $json = file_get_contents('jde_cities.json');
+//    $ar_locations = json_decode($json, true)['rsp']['locations'];
+//    foreach ($ar_locations as $location) {
+//        if (strcasecmp(mb_strtoupper($location['name'], 'utf8'), mb_strtoupper($city, 'utf8')) == 0) {
+//            $result = $location['id'];
+//            break;
+//        }
+//    }
+//    return $result;
+//}
 
 function JDE_GetCityId($city) {
     return GetValueFromDB("jde_cities", "code", $city, "title");
@@ -96,7 +95,7 @@ function JDE_GetCitiesCSV() {
 // TEST JDE
 //echo '<pre>';
 //$start = microtime(true);
-//print_r(JDE_Calculate('Самара', 'Москва', 10, 0.16, 1));
+//print_r(JDE_Calculate('Самара', 'Москва', 10, 0.16, 3));
 //echo "Время выполнения скрипта: " . (microtime(true) - $start);
 //echo '</pre>';
 

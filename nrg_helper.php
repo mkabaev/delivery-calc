@@ -43,7 +43,7 @@ function NRG_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
 
             foreach ($ar['values'] as $value) {
                 if ($value['type'] == "avto") {
-                    $cost_at = $value['price'];
+                    $cost_at = round($value['price']);
 
                     //extract periods
                     preg_match_all('!\d+!', $value['term'], $matches);
@@ -55,7 +55,7 @@ function NRG_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
                     }
                 }
                 if ($value['type'] == "rw") {
-                    $cost_rw = $value['price'];
+                    $cost_rw = round($value['price']);
                     //extract periods
                     preg_match_all('!\d+!', $value['term'], $matches);
                     if (array_key_exists(0, $matches[0])) {
@@ -66,7 +66,7 @@ function NRG_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
                     }
                 }
                 if ($value['type'] == "avia") {
-                    $cost_av = $value['price'];
+                    $cost_av = round($value['price']);
                     //extract periods
                     preg_match_all('!\d+!', $value['term'], $matches);
                     if (array_key_exists(0, $matches[0])) {

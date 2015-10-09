@@ -65,7 +65,7 @@ function PEC_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
         if (array_key_exists("auto", $ar) or array_key_exists("avia", $ar)) { // if PEC response is OK
             $responseStatus = 'ok';
             if (array_key_exists("auto", $ar)) {
-                $cost_at = $ar['auto'][2];
+                $cost_at = round($ar['auto'][2]);
                 if (array_key_exists("periods", $ar)) {
                     preg_match_all('!\d+!', $ar['periods'], $matches);
                     if (array_key_exists(0, $matches[0])) {
@@ -76,22 +76,22 @@ function PEC_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
                     }
                 }
                 if (array_key_exists("alma_auto", $ar)) { // доп. стоимость для Алматы
-                    $cost_at = $cost_at + $ar['alma_auto'][2];
+                    $cost_at = $cost_at + round($ar['alma_auto'][2]);
                     $additionalInfo = 'Доставка будет осуществляться через г. Екатеринбург';
                 }
             }
 
             if (array_key_exists("avia", $ar)) {
-                $cost_av = $ar['avia'][2];
+                $cost_av = round($ar['avia'][2]);
 //        $minDays_av = 0;
 //        $maxDays_av = 0;
             }
 
             if (array_key_exists("take", $ar)) {
-                $pickupCost = $ar['take'][2];
+                $pickupCost = round($ar['take'][2]);
             }
             if (array_key_exists("deliver", $ar)) {
-                $deliveryCost = $ar['deliver'][2];
+                $deliveryCost = round($ar['deliver'][2]);
             }
         } else {
             $responseStatus = 'err';
