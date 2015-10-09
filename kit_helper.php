@@ -41,7 +41,7 @@ function KIT_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
         //echo '<hr/>response is: ' . $json_response;
         $ar = json_decode($json_response, true);
 
-        if (array_key_exists("PRICE", $ar)) { // if KIT response is OK
+        if (array_key_exists("PRICE", $ar) and $ar['PRICE']['TRANSFER']!=null) { // if KIT response is OK
             $responseStatus = 'ok';
             $cost_at = round($ar['PRICE']['TRANSFER']);
             $pickupCost = round($ar['PRICE']['PICKUP']);
@@ -49,8 +49,8 @@ function KIT_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
             $minDays_at = round($ar['DAYS']);
             $maxDays_at = round($ar['DAYS']);
         } else {
-            $result["status"] = "err";
-            $result["text"] = "KIT API error";
+            $responseStatus = 'err';
+            $additionalInfo = "KIT API error. <br/><b>request:<b/> ".$url."<br/><b>response is:<b/> ".$json_response;
         }
     }
     return PrepareReponseArray($responseStatus, $cost_at, $minDays_at, $maxDays_at, $cost_av, $minDays_av, $maxDays_av, $cost_rw, $minDays_rw, $maxDays_rw, $pickupCost, $deliveryCost, $additionalInfo);
@@ -101,7 +101,7 @@ function KIT_GetCities() {
 
 //echo '<pre>';
 //$start = microtime(true);
-//print_r(KIT_Calculate('Самара', 'Улан-Удэ', 10, 0.16, 3));
+//print_r(KIT_Calculate('Самара', 'Тверь', 10, 0.16, 1));
 //echo "Время выполнения скрипта: " . (microtime(true) - $start);
 //echo '</pre>';
 //KIT_GetCities();
