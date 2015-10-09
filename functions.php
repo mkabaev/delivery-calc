@@ -33,13 +33,13 @@ function GetResponse_post($url_request, $ar_request) {
         CURLOPT_POSTFIELDS => json_encode($ar_request),
         CURLOPT_SSL_VERIFYPEER => 0,
         CURLOPT_SSL_VERIFYHOST => 0,
-            //CURLOPT_HTTPHEADER => array('Expect:')
+        //CURLOPT_HTTPHEADER => array('Expect:')
         CURLOPT_TIMEOUT => 3
     ];
     return curl_get_contents($curl_options);
 }
 
-function GetValueFromDB($tableName, $valueName, $searchString) {
+function GetValueFromDB($tableName, $valueName, $searchString, $searchParamName = 'name') {
     $mysqli = new mysqli('localhost', 'root', '', 'dbcalc');
     if ($mysqli->connect_error) {
         die('Connect Error (' . $mysqli->connect_errno . ') ' . $mysqli->connect_error);
@@ -47,7 +47,8 @@ function GetValueFromDB($tableName, $valueName, $searchString) {
     /* Select запросы возвращают результирующий набор */
     mysqli_query($mysqli, "SET NAMES utf8");
 //if ($result = $mysqli->query("SELECT searchString, name FROM cls_cities where searchString like 'Сама%' and code like '%00000000000000000' limit 100")) {
-    if ($result = $mysqli->query("SELECT " . $valueName . " FROM `" . $tableName . "` WHERE name LIKE '" . $searchString . "%'")) {
+    $q="SELECT ". $valueName ." FROM ".$tableName." WHERE ".$searchParamName." LIKE '".$searchString."%'";
+    if ($result = $mysqli->query($q)) {
         //printf("Select вернул %d строк.\n", $result->num_rows);
         //$data=  mysqli_fetch_assoc($result);
         $data = mysqli_fetch_assoc($result); // all($result, MYSQLI_ASSOC);
