@@ -50,7 +50,7 @@ function KIT_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
             $maxDays_at = round($ar['DAYS']);
         } else {
             $responseStatus = 'err';
-            $additionalInfo = "KIT API error. <br/><b>request:<b/> ".$url."<br/><b>response is:<b/> ".$json_response;
+            $additionalInfo = "KIT API error";
         }
     }
     return PrepareReponseArray($responseStatus, $cost_at, $minDays_at, $maxDays_at, $cost_av, $minDays_av, $maxDays_av, $cost_rw, $minDays_rw, $maxDays_rw, $pickupCost, $deliveryCost, $additionalInfo);
