@@ -13,15 +13,9 @@ require_once 'functions.php';
  */
 function PEC_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
     $responseStatus = '';
-    $cost_at = 0;
-    $minDays_at = 0;
-    $maxDays_at = 0;
-    $cost_av = 0;
-    $minDays_av = 0;
-    $maxDays_av = 0;
-    $cost_rw = 0;
-    $minDays_rw = 0;
-    $maxDays_rw = 0;
+    $cost = 0;
+    $minDays = 0;
+    $maxDays = 0;
     $pickupCost = 0;
     $deliveryCost = 0;
     $additionalInfo = '';
@@ -59,46 +53,54 @@ function PEC_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
         //pal: 3 	Требуется запаллечивание груза (0 - не требуется, значение больше нуля - количество паллет)
         //pallets: 4 	Кол-во паллет для расчет услуги паллетной перевозки (только там, где эта услуга предоставляется)
 
-        $url = 'http://pecom.ru/bitrix/components/pecom/calc/ajax.php?places[0][]=&places[0][]=&places[0][]=&places[0][]=' . $volume*$quantity . '&places[0][]=' . $weight*$quantity . '&places[0][]=0&places[0][]=0&take[town]=' . $id_city_from . '&take[tent]=0&take[gidro]=0&take[manip]=0&take[speed]=0&take[moscow]=0&deliver[town]=' . $id_city_to . '&deliver[tent]=0&deliver[gidro]=0&deliver[manip]=0&deliver[speed]=0&deliver[moscow]=0&plombir=0&strah=0&ashan=0&night=0&pal=0&pallets=0';
+        $url = 'http://pecom.ru/bitrix/components/pecom/calc/ajax.php?places[0][]=&places[0][]=&places[0][]=&places[0][]=' . $volume * $quantity . '&places[0][]=' . $weight * $quantity . '&places[0][]=0&places[0][]=0&take[town]=' . $id_city_from . '&take[tent]=0&take[gidro]=0&take[manip]=0&take[speed]=0&take[moscow]=0&deliver[town]=' . $id_city_to . '&deliver[tent]=0&deliver[gidro]=0&deliver[manip]=0&deliver[speed]=0&deliver[moscow]=0&plombir=0&strah=0&ashan=0&night=0&pal=0&pallets=0';
         $json_response = GetResponse_get($url);
         $ar = json_decode($json_response, true, JSON_UNESCAPED_UNICODE);
+        //echo '<pre>';
+        //print_r($ar);
+        //echo '</pre>';
         if (array_key_exists("auto", $ar) or array_key_exists("avia", $ar)) { // if PEC response is OK
             $responseStatus = 'ok';
+            $isTerminal = !array_key_exists("ldeliver", $ar);
+
             if (array_key_exists("auto", $ar)) {
-                $cost_at = round($ar['auto'][2]);
+                $cost = $isTerminal ? round($ar['auto'][2]) : round($ar['auto'][2]) + round($ar['deliver'][2]); // если в городе-получателе нет терминала и требуется обязательная доставка
                 if (array_key_exists("periods", $ar)) {
                     preg_match_all('!\d+!', $ar['periods'], $matches);
                     if (array_key_exists(0, $matches[0])) {
-                        $minDays_at = round($matches[0][0]);
+                        $minDays = round($matches[0][0]);
                     }
                     if (array_key_exists(1, $matches[0])) {
-                        $maxDays_at = round($matches[0][1]);
+                        $maxDays = round($matches[0][1]);
                     }
                 }
-                if (array_key_exists("alma_auto", $ar)) { // доп. стоимость для Алматы
-                    $cost_at = $cost_at + round($ar['alma_auto'][2]);
-                    $additionalInfo = 'Доставка будет осуществляться через г. Екатеринбург';
-                }
-            }
 
-            if (array_key_exists("avia", $ar)) {
-                $cost_av = round($ar['avia'][2]);
-//        $minDays_av = 0;
-//        $maxDays_av = 0;
+                if (!$isTerminal) {
+                    $additionalInfo[1] = "Терминала в " . $city_to . " нет. Стоимость перевозки " . $ar['auto'][1] . ": " . round($ar['auto'][2]) . " + доставка до " . $city_to . ": " . round($ar['deliver'][2]) . ".";
+                }
+
+                if (array_key_exists("alma_auto", $ar)) { // доп. стоимость для Алматы
+                    $cost = $cost + round($ar['alma_auto'][2]);
+                    $additionalInfo[1] = 'Доставка будет осуществляться через г. Екатеринбург';
+                }
             }
 
             if (array_key_exists("take", $ar)) {
                 $pickupCost = round($ar['take'][2]);
             }
             if (array_key_exists("deliver", $ar)) {
-                $deliveryCost = round($ar['deliver'][2]);
+                $deliveryCost = $isTerminal ? round(round($ar['deliver'][2])) : 0; // если терминала нет, то доставка обязательна. Доставка учитывается в $cost
+            }
+
+            if (array_key_exists("avia", $ar)) {
+                $additionalInfo[2] = "Возможна доставка самолетом: " . round($ar['avia'][2]) . " руб.";
             }
         } else {
             $responseStatus = 'err';
             $additionalInfo = 'PEC Api error';
         }
     }
-    return PrepareReponseArray($responseStatus, $cost_at, $minDays_at, $maxDays_at, $cost_av, $minDays_av, $maxDays_av, $cost_rw, $minDays_rw, $maxDays_rw, $pickupCost, $deliveryCost, $additionalInfo);
+    return PrepareReponseArray($responseStatus, $cost, $minDays, $maxDays, $pickupCost, $deliveryCost, $additionalInfo);
 }
 
 function PEC_GetCityId($city) {
@@ -128,6 +130,6 @@ function PEC_GetCitiesCSV() {
 //echo PEC_GetCityId('Самара');
 //echo '<pre>';
 //$start = microtime(true);
-//print_r(PEC_Calculate('Самара', 'Новосибирск', 10, 0.16, 2));
+//print_r(PEC_Calculate('Самара', 'Нягань', 10, 0.16, 2));
 //echo "Время выполнения скрипта: " . (microtime(true) - $start);
 //echo '</pre>';

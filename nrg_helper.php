@@ -13,15 +13,9 @@ require_once 'functions.php';
  */
 function NRG_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
     $responseStatus = '';
-    $cost_at = 0;
-    $minDays_at = 0;
-    $maxDays_at = 0;
-    $cost_av = 0;
-    $minDays_av = 0;
-    $maxDays_av = 0;
-    $cost_rw = 0;
-    $minDays_rw = 0;
-    $maxDays_rw = 0;
+    $cost = 0;
+    $minDays = 0;
+    $maxDays = 0;
     $pickupCost = 0;
     $deliveryCost = 0;
     $additionalInfo = '';
@@ -37,44 +31,37 @@ function NRG_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
         //echo $url;
         $json_response = GetResponse_get($url);
         $ar = json_decode($json_response, true)['rsp'];
-
+        //echo '<pre>';
+        //print_r($ar);
+        //echo '</pre>';
         if ($ar['stat'] == "ok") { // if NRG response is OK
-            $responseStatus = 'ok';
+            $responseStatus = "ok"; // mark result is ok
 
             foreach ($ar['values'] as $value) {
                 if ($value['type'] == "avto") {
-                    $cost_at = round($value['price']);
-
+                    $cost = round($value['price']);
                     //extract periods
                     preg_match_all('!\d+!', $value['term'], $matches);
                     if (array_key_exists(0, $matches[0])) {
-                        $minDays_at = round($matches[0][0]);
+                        $minDays = round($matches[0][0]);
                     }
                     if (array_key_exists(1, $matches[0])) {
-                        $maxDays_at = round($matches[0][1]);
+                        $maxDays = round($matches[0][1]);
                     }
                 }
-                if ($value['type'] == "rw") {
-                    $cost_rw = round($value['price']);
-                    //extract periods
-                    preg_match_all('!\d+!', $value['term'], $matches);
-                    if (array_key_exists(0, $matches[0])) {
-                        $minDays_rw = round($matches[0][0]);
-                    }
-                    if (array_key_exists(1, $matches[0])) {
-                        $maxDays_rw = round($matches[0][1]);
-                    }
-                }
+//                if ($value['type'] == "rw") {
+//                    $cost_rw = round($value['price']);
+//                    //extract periods
+//                    preg_match_all('!\d+!', $value['term'], $matches);
+//                    if (array_key_exists(0, $matches[0])) {
+//                        $minDays_rw = round($matches[0][0]);
+//                    }
+//                    if (array_key_exists(1, $matches[0])) {
+//                        $maxDays_rw = round($matches[0][1]);
+//                    }
+//                }
                 if ($value['type'] == "avia") {
-                    $cost_av = round($value['price']);
-                    //extract periods
-                    preg_match_all('!\d+!', $value['term'], $matches);
-                    if (array_key_exists(0, $matches[0])) {
-                        $minDays_av = round($matches[0][0]);
-                    }
-                    if (array_key_exists(1, $matches[0])) {
-                        $maxDays_av = ($matches[0][1]);
-                    }
+                    $additionalInfo[1] = "Возможна доставка самолетом: " . Round($value['price']) . " руб.";
                 }
             }
         } else {
@@ -82,7 +69,7 @@ function NRG_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
             $additionalInfo = 'NRG Api error';
         }
     }
-    return PrepareReponseArray($responseStatus, $cost_at, $minDays_at, $maxDays_at, $cost_av, $minDays_av, $maxDays_av, $cost_rw, $minDays_rw, $maxDays_rw, $pickupCost, $deliveryCost, $additionalInfo);
+    return PrepareReponseArray($responseStatus, $cost, $minDays, $maxDays, $pickupCost, $deliveryCost, $additionalInfo);
 }
 
 function NRG_GetCityIdFromFile($city) {
@@ -131,6 +118,6 @@ function NRG_GetCitiesCSV() {
 // TEST NRG
 //echo '<pre>';
 //$start = microtime(true);
-//print_r(NRG_Calculate('Самара', 'Новосибирск', 10, 0.16, 1));
+//print_r(NRG_Calculate('Самара', 'Москва', 10, 0.16, 1));
 //echo "Время выполнения скрипта: " . (microtime(true) - $start);
 //echo '</pre>';

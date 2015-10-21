@@ -26,17 +26,52 @@ if (!is_null($city_to) and ! is_null($weight) and ! is_null($volume) and ! is_nu
     $ar_JDEResult = JDE_Calculate("Самара", $city_to, $weight, $volume, $quantity);
 
     if ($isHTMLResult) {
-        $nrg_cost = array_key_exists('auto', $ar_NRGResult) ? $ar_NRGResult['auto']['cost'] : '-';
-        $dellin_cost = array_key_exists('auto', $ar_DELLINResult) ?$ar_DELLINResult['auto']['cost'] : '-';
-        $pec_cost = array_key_exists('auto', $ar_PECResult) ? $ar_PECResult['auto']['cost'] : '-';
-        $kit_cost = array_key_exists('auto', $ar_KITResult) ? $ar_KITResult['auto']['cost'] : '-';
-        $jde_cost = array_key_exists('rw', $ar_JDEResult) ? $ar_JDEResult['rw']['cost'] : '-';
+        $nrg_cost = array_key_exists('cost', $ar_NRGResult) ? $ar_NRGResult['cost'] : '-';
+        $dellin_cost = array_key_exists('cost', $ar_DELLINResult) ? $ar_DELLINResult['cost'] : '-';
+        $pec_cost = array_key_exists('cost', $ar_PECResult) ? $ar_PECResult['cost'] : '-';
+        $kit_cost = array_key_exists('cost', $ar_KITResult) ? $ar_KITResult['cost'] : '-';
+        $jde_cost = array_key_exists('cost', $ar_JDEResult) ? $ar_JDEResult['cost'] : '-';
         echo '<h3>Доставка в ' . $city_to . '</h3>';
+
+        if ($nrg_cost == '-') {
+            echo "<font color='gray'>";
+        }
         echo "<p>Энергия: <b>" . $nrg_cost . " руб.</b><br/>" . json_encode($ar_NRGResult, JSON_UNESCAPED_UNICODE) . "<p/>";
+        if ($nrg_cost = '-') {
+            echo "</font>";
+        }
+
+        if ($dellin_cost == '-') {
+            echo "<font color='gray'>";
+        }
         echo "<p>Деловые Линии: <b>" . $dellin_cost . " руб.</b><br/>" . json_encode($ar_DELLINResult, JSON_UNESCAPED_UNICODE) . "<p/>";
+        if ($dellin_cost = '-') {
+            echo "</font>";
+        }
+
+        if ($pec_cost == '-') {
+            echo "<font color='gray'>";
+        }
         echo "<p>ПЭК: <b>" . $pec_cost . " руб.</b><br/>" . json_encode($ar_PECResult, JSON_UNESCAPED_UNICODE) . "<p/>";
+        if ($pec_cost = '-') {
+            echo "</font>";
+        }
+
+        if ($kit_cost == '-') {
+            echo "<font color='gray'>";
+        }
         echo "<p>КИТ: <b>" . $kit_cost . " руб.</b><br/>" . json_encode($ar_KITResult, JSON_UNESCAPED_UNICODE) . "<p/>";
+        if ($kit_cost = '-') {
+            echo "</font>";
+        }
+
+        if ($jde_cost == '-') {
+            echo "<font color='gray'>";
+        }
         echo "<p>ЖелДорЭкспедиция: <b>" . $jde_cost . " руб.</b><br/>" . json_encode($ar_JDEResult, JSON_UNESCAPED_UNICODE) . "<p/>";
+        if ($jde_cost = '-') {
+            echo "</font>";
+        }
     } else {
         //echo '<pre>';
         //print_r($ar_result);

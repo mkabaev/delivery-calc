@@ -12,15 +12,9 @@ require_once 'functions.php';
  */
 function KIT_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
     $responseStatus = '';
-    $cost_at = 0;
-    $minDays_at = 0;
-    $maxDays_at = 0;
-    $cost_av = 0;
-    $minDays_av = 0;
-    $maxDays_av = 0;
-    $cost_rw = 0;
-    $minDays_rw = 0;
-    $maxDays_rw = 0;
+    $cost = 0;
+    $minDays = 0;
+    $maxDays = 0;
     $pickupCost = 0;
     $deliveryCost = 0;
     $additionalInfo = '';
@@ -43,17 +37,17 @@ function KIT_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
 
         if (array_key_exists("PRICE", $ar) and $ar['PRICE']['TRANSFER']!=null) { // if KIT response is OK
             $responseStatus = 'ok';
-            $cost_at = round($ar['PRICE']['TRANSFER']);
+            $cost = round($ar['PRICE']['TRANSFER']);
             $pickupCost = round($ar['PRICE']['PICKUP']);
             $deliveryCost = round($ar['PRICE']['DELIVERY']);
-            $minDays_at = round($ar['DAYS']);
-            $maxDays_at = round($ar['DAYS']);
+            $minDays = round($ar['DAYS']);
+            $maxDays = round($ar['DAYS']);
         } else {
             $responseStatus = 'err';
             $additionalInfo = "KIT API error";
         }
     }
-    return PrepareReponseArray($responseStatus, $cost_at, $minDays_at, $maxDays_at, $cost_av, $minDays_av, $maxDays_av, $cost_rw, $minDays_rw, $maxDays_rw, $pickupCost, $deliveryCost, $additionalInfo);
+    return PrepareReponseArray($responseStatus, $cost, $minDays, $maxDays, $pickupCost, $deliveryCost, $additionalInfo);
 }
 
 function KIT_GetCityIdFromFile($city) {

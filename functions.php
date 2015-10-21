@@ -47,7 +47,7 @@ function GetValueFromDB($tableName, $valueName, $searchString, $searchParamName 
     /* Select запросы возвращают результирующий набор */
     mysqli_query($mysqli, "SET NAMES utf8");
 //if ($result = $mysqli->query("SELECT searchString, name FROM cls_cities where searchString like 'Сама%' and code like '%00000000000000000' limit 100")) {
-    $q="SELECT ". $valueName ." FROM ".$tableName." WHERE ".$searchParamName." LIKE '".$searchString."%'";
+    $q = "SELECT " . $valueName . " FROM " . $tableName . " WHERE " . $searchParamName . " LIKE '" . $searchString . "%'";
     if ($result = $mysqli->query($q)) {
         //printf("Select вернул %d строк.\n", $result->num_rows);
         //$data=  mysqli_fetch_assoc($result);
@@ -77,35 +77,27 @@ function GetValueFromDB($tableName, $valueName, $searchString, $searchParamName 
     }
 }
 
-function PrepareReponseArray($responseStatus, $cost_at, $minDays_at, $maxDays_at, $cost_av, $minDays_av, $maxDays_av, $cost_rw, $minDays_rw, $maxDays_rw, $pickupCost, $deliveryCost, $additionalInfo) {
-    $arr_auto = [
-        "cost" => $cost_at,
-        "minDays" => $minDays_at,
-        "maxDays" => $maxDays_at,
-    ];
-
-    $arr_avia = [
-        "cost" => $cost_av,
-        "minDays" => $minDays_av,
-        "maxDays" => $maxDays_av,
-    ];
-
-    $arr_rw = [
-        "cost" => $cost_rw,
-        "minDays" => $minDays_rw,
-        "maxDays" => $maxDays_rw,
-    ];
+function PrepareReponseArray($responseStatus, $cost, $minDays, $maxDays, $pickupCost, $deliveryCost, $additionalInfo) {
+//    $arr_auto = [
+//        "cost" => $cost_at,
+//        "minDays" => $minDays_at,
+//        "maxDays" => $maxDays_at,
+//    ];
 
     $result = ["status" => $responseStatus];
-    if ($cost_at > 0) {
-        $result['auto'] = $arr_auto;
+    if ($cost > 0) {
+        $result['cost'] = $cost;
     }
-    if ($cost_av > 0) {
-        $result['avia'] = $arr_avia;
+
+    if ($minDays > 0) {
+        $result['minDays'] = $minDays;
     }
-    if ($cost_rw > 0) {
-        $result['rw'] = $arr_rw;
+    if ($maxDays > 0) {
+        $result['maxDays'] = $maxDays;
     }
+//    if ($cost_av > 0) {
+//        $result['avia'] = $arr_avia;
+//    }
 
     if ($pickupCost > 0) {
         $result['pickupCost'] = $pickupCost;
@@ -114,8 +106,6 @@ function PrepareReponseArray($responseStatus, $cost_at, $minDays_at, $maxDays_at
         $result['deliveryCost'] = $deliveryCost;
     }
 
-    if ($additionalInfo != "") {
-        $result['addinfo'] = $additionalInfo;
-    }
+    $result['additionalInfo'] = $additionalInfo;
     return $result;
 }

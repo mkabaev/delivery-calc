@@ -13,15 +13,9 @@ require_once 'functions.php';
  */
 function JDE_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
     $responseStatus = '';
-    $cost_at = 0;
-    $minDays_at = 0;
-    $maxDays_at = 0;
-    $cost_av = 0;
-    $minDays_av = 0;
-    $maxDays_av = 0;
-    $cost_rw = 0;
-    $minDays_rw = 0;
-    $maxDays_rw = 0;
+    $cost = 0;
+    $minDays = 0;
+    $maxDays = 0;
     $pickupCost = 0;
     $deliveryCost = 0;
     $additionalInfo = '';
@@ -43,18 +37,18 @@ function JDE_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
         $ar = json_decode($json_response, true);
         if ($ar != -1 or array_key_exists('errors', $ar)) { // if JDE response is OK
             $responseStatus = 'ok';
-            $cost_rw = round($ar['price']);
-            $minDays_rw = $ar['mindays'];
-            $maxDays_rw = $ar['maxdays'];
+            $cost = round($ar['price']);
+            $minDays = $ar['mindays'];
+            $maxDays = $ar['maxdays'];
         } else {
             $responseStatus = 'err';
             $additionalInfo = 'JDE Api error';
             if (array_key_exists('errors', $ar)) {
-                $additionalInfo = $additionalInfo . ': ' . $ar['errors'];
+                $additionalInfo = $ar['errors'];
             }
         }
     }
-    return PrepareReponseArray($responseStatus, $cost_at, $minDays_at, $maxDays_at, $cost_av, $minDays_av, $maxDays_av, $cost_rw, $minDays_rw, $maxDays_rw, $pickupCost, $deliveryCost, $additionalInfo);
+    return PrepareReponseArray($responseStatus, $cost, $minDays, $maxDays, $pickupCost, $deliveryCost, $additionalInfo);
 }
 
 //function JDE_GetCityIdFromFile($city) {

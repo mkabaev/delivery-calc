@@ -20,22 +20,17 @@ $url_statuses = 'https://api.dellin.ru/v1/public/statuses.json';
  */
 function DELLIN_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
     global $appkey;
-    $responseStatus = '';
-    $cost_at = 0;
-    $minDays_at = 0;
-    $maxDays_at = 0;
-    $cost_av = 0;
-    $minDays_av = 0;
-    $maxDays_av = 0;
-    $cost_rw = 0;
-    $minDays_rw = 0;
-    $maxDays_rw = 0;
-    $pickupCost = 0;
-    $deliveryCost = 0;
-    $additionalInfo = '';
+    $responseStatus = ''; //Статус
+    $cost = 0; //Стоимость межтерминальной перевозки
+    $minDays = 0; //Минимальное кол-во дней
+    $maxDays = 0; //Макс кол-во дней
+    $pickupCost = 0; //Стоимость забора груза
+    $deliveryCost = 0; //Стоимость доставки до получателя
+    $additionalInfo = ''; //Доп.инфо
 
     $id_city_from = DELLIN_GetCityId($city_from); //"6300000100000000000000000";
     $id_city_to = DELLIN_GetCityId($city_to); //"7800000000000000000000000";
+    $isTerminal = DELLIN_TerminalExists($city_to);
     if (is_null($id_city_from) or is_null($id_city_to)) {
         $responseStatus = "err";
         $additionalInfo = "В базе данных не найден один из городов отправитель|получатель: " . $id_city_from . "|" . $id_city_to;
@@ -45,8 +40,8 @@ function DELLIN_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
             "derivalDoor" => true, // необходима доставка груза от адреса     (необязательный параметр), true/false
             "arrivalPoint" => $id_city_to, // код КЛАДР пункта прибытия (обязательный параметр)
             "arrivalDoor" => true, // необходима доставка груза до адреса    (необязательный параметр), true/false
-            "sizedVolume" => $volume*$quantity, // общий объём груза в кубических метрах (обязательный параметр)
-            "sizedWeight" => $weight*$quantity, // общий вес груза в килограммах (обязательный параметр)
+            "sizedVolume" => $volume * $quantity, // общий объём груза в кубических метрах (обязательный параметр)
+            "sizedWeight" => $weight * $quantity, // общий вес груза в килограммах (обязательный параметр)
             //    "oversizedVolume" => "1", // объём негабаритной части груза в метрах кубических (необязательный параметр)
             //    "oversizedWeight" => "1", // вес негабаритной части груза в килограммах (необязательный параметр)
             //    "length" => "1", // длинна самого длинного из мест (необязательный параметр)
@@ -68,23 +63,39 @@ function DELLIN_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
 //echo '</pre><hr/>';
         if (!array_key_exists("errorses", $ar)) { // if DELLIN response is OK
             $responseStatus = "ok"; // mark result is ok
+
+            $cost = $isTerminal?round($ar['intercity']['price']):round($ar['intercity']['price']+round($ar['arrival']['price']));
+            $minDays = round($ar['time']['value']);
+            $maxDays = round($ar['time']['value']);
+
             if (array_key_exists("derival", $ar)) {
                 $pickupCost = round($ar['derival']['price']);
-                //$ar['derival'['terminals']
+                //$additionalInfo['terminals']['departure'] = $ar['derival']['terminals'];
             }
+
+            if (!$isTerminal) {
+                $additionalInfo[1]="Терминала в " . $city_to . " нет. Стоимость перевозки до ".$ar['arrival']['terminal'].": ".round($ar['intercity']['price'])." + доставка до " . $city_to . ": ".round($ar['arrival']['price']). ".";
+            }
+
+            if (array_key_exists("express", $ar)) {
+                $additionalInfo[2] = "Возможна Экспресс-Доставка: " . Round($ar['express']['price']) . " руб.";
+            }
+
+            if (array_key_exists("air", $ar)) {
+                $additionalInfo[3] = "Возможна доставка самолетом: " . Round($ar['air']['price']) . " руб.";
+            }
+
             if (array_key_exists("arrival", $ar)) {
-                $deliveryCost = round($ar['arrival']['price']);
-                //$ar['arrival'['terminals']
+                $deliveryCost = $isTerminal?round($ar['arrival']['price']):0; // если терминала нет, то доставка обязательна. Доставка учитывается в $cost
+                //$additionalInfo['terminals'] = $ar['arrival']['terminals'];
             }
-            $cost_at = round($ar['price'] - $pickupCost - $deliveryCost);
-            $minDays_at = round($ar['time']['value']);
-            $maxDays_at = round($ar['time']['value']);
+
         } else {
             $responseStatus = "err";
             $additionalInfo = "DELLIN API error";
         }
     }
-    return PrepareReponseArray($responseStatus, $cost_at, $minDays_at, $maxDays_at, $cost_av, $minDays_av, $maxDays_av, $cost_rw, $minDays_rw, $maxDays_rw, $pickupCost, $deliveryCost, $additionalInfo);
+    return PrepareReponseArray($responseStatus, $cost, $minDays, $maxDays, $pickupCost, $deliveryCost, $additionalInfo);
 }
 
 function DELLIN_GetCities_CSVurl() {
@@ -105,12 +116,17 @@ function DELLIN_GetCityId($city) {
     return GetValueFromDB("dellin_cities", "codeKLADR", $city);
 }
 
+function DELLIN_TerminalExists($city) {
+    return GetValueFromDB("dellin_cities", "isTerminal", $city);
+}
+
 // TEST DELLIN
 //echo '<pre>';
 //$start = microtime(true);
-//print_r(DELLIN_Calculate('Самара', 'Санкт-Петербург', 10, 0.1, 3));
+//print_r(DELLIN_Calculate('Самара', 'Нягань', 10, 0.16, 1));
 //echo "Время выполнения скрипта: " . (microtime(true) - $start);
 //echo '</pre>';
 
+//echo DELLIN_TerminalExists('нягань');
 //echo DELLIN_GetCities_CSVurl(); //ссылка действительна 10 мин с момента получения
 //echo DELLIN_GetCityId('Самара');
