@@ -32,7 +32,7 @@ function KIT_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
 // response is {"PRICE":{"PICKUP":"350.0","TRANSFER":"300.0","DELIVERY":"0.0","TOTAL":"650.0","EXTRA":[{"price":"50.0","name":"\u0421\u0442\u0440\u0430\u0445\u043e\u0432\u0430\u043d\u0438\u0435"}]},"IS_OVER":"","DAYS":3.5,"E_WAERS":"RUB","E_RATE":{"AMD":"8.0","BYR":"300.0","KGS":"1.0","KZT":"5.0","UAH":"0.33333","RUB":1}}
 // response is {"PRICE":{"PICKUP":"350.0","TRANSFER":"500.0","DELIVERY":"400.0","TOTAL":"1250.0"},"IS_OVER":"","DAYS":7,"E_WAERS":"RUB","E_RATE":{"AMD":"8.0","BYR":"300.0","KGS":"1.0","KZT":"5.0","UAH":"0.33333","RUB":1}}
         $json_response = GetResponse_get($url);
-        //echo '<hr/>response is: ' . $json_response;
+//        echo '<hr/>response is: ' . $json_response;
         $ar = json_decode($json_response, true);
 
         if (array_key_exists("PRICE", $ar) and $ar['PRICE']['TRANSFER']!=null) { // if KIT response is OK
@@ -95,7 +95,7 @@ function KIT_GetCities() {
 
 //echo '<pre>';
 //$start = microtime(true);
-//print_r(KIT_Calculate('Самара', 'Тверь', 10, 0.16, 1));
+//print_r(KIT_Calculate('Самара', 'Рязань', 10, 0.16, 1));
 //echo "Время выполнения скрипта: " . (microtime(true) - $start);
 //echo '</pre>';
 //KIT_GetCities();

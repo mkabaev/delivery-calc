@@ -1,5 +1,46 @@
 <?php
 
+// 0 - production
+// 1 - devPlaceSGS
+// 2 - devPlaceHome
+$MODE = 1;
+
+switch ($MODE) {
+    case 0:
+        $CURLOPT_PROXY = '';
+        $CURLOPT_PROXYUSERPWD = '';
+        $MYSQL_SERVER = 'vimax.mysql';
+        $MYSQL_USER = 'vimax_test';
+        $MYSQL_PASSWORD = 't_B6gKYj';
+        $MYSQL_DB = 'vimax_test';
+        break;
+    case 1:
+        $CURLOPT_PROXY = '10.254.30.3:8080';
+        $CURLOPT_PROXYUSERPWD = 'eame\maxim_kabaev:RJHJKMfhneh18';
+        $MYSQL_SERVER = 'localhost';
+        $MYSQL_USER = 'root';
+        $MYSQL_PASSWORD = '';
+        $MYSQL_DB = 'dbcalc';
+        break;
+    case 2:
+        $CURLOPT_PROXY = '';
+        $CURLOPT_PROXYUSERPWD = '';
+        $MYSQL_SERVER = 'localhost';
+        $MYSQL_USER = 'root';
+        $MYSQL_PASSWORD = '';
+        $MYSQL_DB = 'dbcalc';
+        break;
+    default:
+        $CURLOPT_TIMEOUT = 5;
+        $CURLOPT_PROXY = '';
+        $CURLOPT_PROXYUSERPWD = '';
+        $MYSQL_SERVER = '';
+        $MYSQL_USER = '';
+        $MYSQL_PASSWORD = '';
+        $MYSQL_DB = '';
+        break;
+}
+
 function curl_get_contents($options) {
     $ch = curl_init();
     curl_setopt_array($ch, $options);
@@ -11,22 +52,28 @@ function curl_get_contents($options) {
 }
 
 function GetResponse_get($url_request) {
+    global $CURLOPT_TIMEOUT;
+    global $CURLOPT_PROXY;
+    global $CURLOPT_PROXYUSERPWD;
     $curl_options = [CURLOPT_URL => $url_request,
         CURLOPT_RETURNTRANSFER => 1,
         CURLOPT_HEADER => 0,
-        CURLOPT_PROXY => '10.254.30.3:8080',
-        CURLOPT_PROXYUSERPWD => 'eame\maxim_kabaev:RJHJKMfhneh18',
-        CURLOPT_TIMEOUT => 3
+        CURLOPT_PROXY => $CURLOPT_PROXY,
+        CURLOPT_PROXYUSERPWD => $CURLOPT_PROXYUSERPWD,
+        CURLOPT_TIMEOUT => $CURLOPT_TIMEOUT
     ];
     return curl_get_contents($curl_options);
 }
 
 function GetResponse_post($url_request, $ar_request) {
+    global $CURLOPT_TIMEOUT;
+    global $CURLOPT_PROXY;
+    global $CURLOPT_PROXYUSERPWD;
     $curl_options = [CURLOPT_URL => $url_request,
         CURLOPT_RETURNTRANSFER => 1,
         //CURLOPT_HEADER => 0,
-        CURLOPT_PROXY => '10.254.30.3:8080',
-        CURLOPT_PROXYUSERPWD => 'eame\maxim_kabaev:RJHJKMfhneh18',
+        CURLOPT_PROXY => $CURLOPT_PROXY,
+        CURLOPT_PROXYUSERPWD => $CURLOPT_PROXYUSERPWD,
         CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
         //CURLOPT_CUSTOMREQUEST => "POST",
         CURLOPT_POST => 1,
@@ -34,13 +81,17 @@ function GetResponse_post($url_request, $ar_request) {
         CURLOPT_SSL_VERIFYPEER => 0,
         CURLOPT_SSL_VERIFYHOST => 0,
         //CURLOPT_HTTPHEADER => array('Expect:')
-        CURLOPT_TIMEOUT => 3
+        CURLOPT_TIMEOUT => $CURLOPT_TIMEOUT
     ];
     return curl_get_contents($curl_options);
 }
 
 function GetValueFromDB($tableName, $valueName, $searchString, $searchParamName = 'name') {
-    $mysqli = new mysqli('localhost', 'root', '', 'dbcalc');
+    global $MYSQL_SERVER;
+    global $MYSQL_USER;
+    global $MYSQL_PASSWORD;
+    global $MYSQL_DB;
+    $mysqli = new mysqli($MYSQL_SERVER, $MYSQL_USER, $MYSQL_PASSWORD, $MYSQL_DB);
     if ($mysqli->connect_error) {
         die('Connect Error (' . $mysqli->connect_errno . ') ' . $mysqli->connect_error);
     }

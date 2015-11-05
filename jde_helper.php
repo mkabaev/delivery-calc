@@ -28,12 +28,12 @@ function JDE_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
         $additionalInfo = "В базе данных не найден один из городов отправитель|получатель: " . $id_city_from . "|" . $id_city_to;
     } else {
         $url = "http://apitest.jde.ru:8000/calculator/price?from=".$id_city_from."&to=".$id_city_to."&weight=".$weight*$quantity."&width=1&volume=".$volume*$quantity;
-        //echo $url;
+        echo 'Request is: '.$url;
         $json_response = GetResponse_get($url);
         // normal response: {"price":"5118.0000","mindays":"7","maxdays":"10"}
         // err response: {"errors":"You should determine all required fields. Check dev docs."}
         // err response2: -1
-        //echo '<br/>Response is: ' . $json_response;
+        echo '<br/>Response is: ' . $json_response;
         $ar = json_decode($json_response, true);
         if ($ar != -1 or array_key_exists('errors', $ar)) { // if JDE response is OK
             $responseStatus = 'ok';
@@ -87,11 +87,11 @@ function JDE_GetCitiesCSV() {
 }
 
 // TEST JDE
-//echo '<pre>';
-//$start = microtime(true);
-//print_r(JDE_Calculate('Самара', 'Москва', 10, 0.16, 3));
-//echo "Время выполнения скрипта: " . (microtime(true) - $start);
-//echo '</pre>';
+echo 'FUNC RESULT <pre>';
+$start = microtime(true);
+print_r(JDE_Calculate('Самара', 'Москва', 10, 0.16, 1));
+echo "Время выполнения скрипта: " . (microtime(true) - $start);
+echo '</pre>';
 
 //JDE_GetCitiesCSV();
 //echo JDE_GetCityId('Новосибирск');

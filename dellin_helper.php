@@ -47,7 +47,7 @@ function DELLIN_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
             //    "length" => "1", // длинна самого длинного из мест (необязательный параметр)
             //    "width" => "1", // ширина самого широкого из мест (необязательный параметр)
             //    "height" => "1", // высота самого высокого из мест (необязательный параметр)
-            //    "statedValue" => 1000, // заявленная стоимость груза в рублях. необходимо передать этот параметр, если требуется страхование груза с заявленной стоимостью         (необязательный параметр)
+            "statedValue" => 10000, // заявленная стоимость груза в рублях. необходимо передать этот параметр, если требуется страхование груза с заявленной стоимостью         (необязательный параметр)
             //    "packages" => [
             //        "0xAD22189D098FB9B84EEC0043196370D6"
             //    ], // необходимо упаковать груз в упаковку (необязательные параметры)
@@ -59,7 +59,7 @@ function DELLIN_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
         $json_response = GetResponse_post($url_calc, $ar_request);
         $ar = json_decode($json_response, true);
 //echo '<pre>';
-//print_r($ar_request);
+//print_r($ar);
 //echo '</pre><hr/>';
         if (!array_key_exists("errorses", $ar)) { // if DELLIN response is OK
             $responseStatus = "ok"; // mark result is ok
@@ -77,19 +77,22 @@ function DELLIN_Calculate($city_from, $city_to, $weight, $volume, $quantity) {
                 $additionalInfo[1]="Терминала в " . $city_to . " нет. Стоимость перевозки до ".$ar['arrival']['terminal'].": ".round($ar['intercity']['price'])." + доставка до " . $city_to . ": ".round($ar['arrival']['price']). ".";
             }
 
+            if (array_key_exists("insurance", $ar)) {
+                $additionalInfo[2] = "Страховка груза: "  . Round($ar['insurance']) . " руб.";
+            }
+
             if (array_key_exists("express", $ar)) {
-                $additionalInfo[2] = "Возможна Экспресс-Доставка: " . Round($ar['express']['price']) . " руб.";
+                $additionalInfo[3] = "Возможна Экспресс-Доставка: " . Round($ar['express']['price']) . " руб.";
             }
 
             if (array_key_exists("air", $ar)) {
-                $additionalInfo[3] = "Возможна доставка самолетом: " . Round($ar['air']['price']) . " руб.";
+                $additionalInfo[4] = "Возможна доставка самолетом: " . Round($ar['air']['price']) . " руб.";
             }
 
             if (array_key_exists("arrival", $ar)) {
                 $deliveryCost = $isTerminal?round($ar['arrival']['price']):0; // если терминала нет, то доставка обязательна. Доставка учитывается в $cost
                 //$additionalInfo['terminals'] = $ar['arrival']['terminals'];
             }
-
         } else {
             $responseStatus = "err";
             $additionalInfo = "DELLIN API error";
