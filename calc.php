@@ -1,10 +1,10 @@
 <?php
-
 require_once 'nrg_helper.php';
 require_once 'dellin_helper.php';
 require_once 'kit_helper.php';
 require_once 'pec_helper.php';
 require_once 'jde_helper.php';
+// TODO http://www.dpd.ru/dpd/integration/integration.do2
 
 $city_to = filter_input(INPUT_GET, 'city_to');
 $weight = filter_input(INPUT_GET, 'weight');
