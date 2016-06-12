@@ -3,7 +3,7 @@
 // 0 - production
 // 1 - devPlaceSGS
 // 2 - devPlaceHome
-$MODE = 1;
+$MODE = 2;
 
 switch ($MODE) {
     case 0:
@@ -28,7 +28,7 @@ switch ($MODE) {
         $MYSQL_SERVER = 'localhost';
         $MYSQL_USER = 'root';
         $MYSQL_PASSWORD = '';
-        $MYSQL_DB = 'dbcalc';
+        $MYSQL_DB = 'dbvarm';
         break;
     default:
         $CURLOPT_TIMEOUT = 5;
@@ -65,7 +65,30 @@ function GetResponse_get($url_request) {
     return curl_get_contents($curl_options);
 }
 
-function GetResponse_post($url_request, $ar_request) {
+function get_web_page($url) {
+    $options = array(
+        CURLOPT_RETURNTRANSFER => true,   // return web page
+        CURLOPT_HEADER         => false,  // don't return headers
+        CURLOPT_FOLLOWLOCATION => true,   // follow redirects
+        CURLOPT_MAXREDIRS      => 10,     // stop after 10 redirects
+        CURLOPT_ENCODING       => "",     // handle compressed
+        CURLOPT_USERAGENT      => "test", // name of client
+        CURLOPT_AUTOREFERER    => true,   // set referrer on redirect
+        CURLOPT_CONNECTTIMEOUT => 120,    // time-out on connect
+        CURLOPT_TIMEOUT        => 120,    // time-out on response
+    ); 
+
+    $ch = curl_init($url);
+    curl_setopt_array($ch, $options);
+
+    $content  = curl_exec($ch);
+
+    curl_close($ch);
+
+    return $content;
+}
+
+function GetResponse_post($url_request, $request_data) {
     global $CURLOPT_TIMEOUT;
     global $CURLOPT_PROXY;
     global $CURLOPT_PROXYUSERPWD;
@@ -77,7 +100,7 @@ function GetResponse_post($url_request, $ar_request) {
         CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
         //CURLOPT_CUSTOMREQUEST => "POST",
         CURLOPT_POST => 1,
-        CURLOPT_POSTFIELDS => json_encode($ar_request),
+        CURLOPT_POSTFIELDS => $request_data,
         CURLOPT_SSL_VERIFYPEER => 0,
         CURLOPT_SSL_VERIFYHOST => 0,
         //CURLOPT_HTTPHEADER => array('Expect:')

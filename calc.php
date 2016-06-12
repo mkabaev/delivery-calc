@@ -1,5 +1,5 @@
 <?php
-require_once 'nrg_helper.php';
+require_once 'nrg/nrg_helper.php';
 require_once 'dellin_helper.php';
 require_once 'kit_helper.php';
 require_once 'pec_helper.php';
